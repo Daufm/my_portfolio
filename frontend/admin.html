@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel — Fuad Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050810;
+      --bg2: #0b1120;
+      --bg3: #0f1a2e;
+      --green: #00ff88;
+      --blue: #00bfff;
+      --purple: #9333ea;
+      --pink: #f472b6;
+      --red: #ef4444;
+      --yellow: #fbbf24;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(0, 255, 136, 0.15);
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --code: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 3px;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      padding: .85rem 1.4rem;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: .8rem;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all .3s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: none;
+    }
+
+    .toast.success {
+      background: rgba(0, 255, 136, .15);
+      border: 1px solid var(--green);
+      color: var(--green);
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, .15);
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+
+    /* ══════════════════════════
+       LOGIN PAGE
+    ══════════════════════════ */
+    #loginPage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0, 255, 136, .07) 0%, transparent 60%);
+    }
+
+    .login-card {
+      background: var(--bg2);
+      border: 1px solid rgba(0, 255, 136, .2);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp .6s ease both;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo .logo-text {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      color: var(--green);
+      letter-spacing: 3px;
+    }
+
+    .login-logo .logo-text span {
+      color: var(--blue);
+    }
+
+    .login-logo .logo-sub {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: .3rem;
+    }
+
+    .login-title {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 1.8rem;
+      text-align: center;
+    }
+
+    .login-title span {
+      color: var(--green);
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--green);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 6px;
+      padding: .8rem 1rem;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: .9rem;
+      outline: none;
+      transition: all .3s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, .08);
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .form-select option {
+      background: var(--bg2);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--green);
+      color: #050810;
+      border: none;
+      padding: .9rem 2rem;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      margin-top: .5rem;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 30px rgba(0, 255, 136, .4);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .login-error {
+      display: none;
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .3);
+      border-radius: 6px;
+      padding: .75rem 1rem;
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--red);
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    /* ══════════════════════════
+       DASHBOARD / EDITOR
+    ══════════════════════════ */
+    #dashPage {
+      display: none;
+      min-height: 100vh;
+    }
+
+    /* Top bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5, 8, 16, .95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0, 255, 136, .1);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-logo {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--green);
+      letter-spacing: 2px;
+    }
+
+    .topbar-logo span {
+      color: var(--blue);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .admin-badge {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 20px;
+      padding: .25rem .8rem;
+    }
+
+    .admin-badge span {
+      color: var(--green);
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, .3);
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: 1px;
+      padding: .35rem .9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: .3s;
+      text-transform: uppercase;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, .1);
+      border-color: var(--red);
+    }
+
+    /* Content */
+    .dash-body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* Step 1 — choose type */
+    .step-header {
+      margin-bottom: 2rem;
+    }
+
+    .step-tag {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--green);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: .4rem;
+    }
+
+    .step-title {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    .step-title span {
+      color: var(--green);
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media(max-width:560px) {
+      .type-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .type-card {
+      background: var(--card);
+      border: 2px solid rgba(255, 255, 255, .07);
+      border-radius: 14px;
+      padding: 2rem 1.5rem;
+      cursor: pointer;
+      transition: all .3s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .type-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: .3s;
+    }
+
+    .type-card.blog-type::before {
+      background: radial-gradient(circle at 50% 0%, rgba(0, 191, 255, .08) 0%, transparent 70%);
+    }
+
+    .type-card.wu-type::before {
+      background: radial-gradient(circle at 50% 0%, rgba(0, 255, 136, .08) 0%, transparent 70%);
+    }
+
+    .type-card:hover::before,
+    .type-card.selected::before {
+      opacity: 1;
+    }
+
+    .type-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .type-card.selected.blog-type {
+      border-color: var(--blue);
+      box-shadow: 0 0 30px rgba(0, 191, 255, .15);
+    }
+
+    .type-card.selected.wu-type {
+      border-color: var(--green);
+      box-shadow: 0 0 30px rgba(0, 255, 136, .15);
+    }
+
+    .type-icon {
+      font-size: 2.8rem;
+      margin-bottom: .75rem;
+    }
+
+    .type-name {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: .4rem;
+    }
+
+    .type-desc {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .type-check {
+      position: absolute;
+      top: .75rem;
+      right: .75rem;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      transition: .3s;
+    }
+
+    .type-card.selected.blog-type .type-check {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #050810;
+    }
+
+    .type-card.selected.wu-type .type-check {
+      background: var(--green);
+      border-color: var(--green);
+      color: #050810;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, .06);
+      margin: 2rem 0;
+    }
+
+    /* Form sections */
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+      animation: fadeUp .4s ease both;
+    }
+
+    .section-heading {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--green);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0, 255, 136, .15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media(max-width:560px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 140px;
+      font-family: var(--code);
+      font-size: .85rem;
+      line-height: 1.7;
+    }
+
+    .form-textarea.content-area {
+      min-height: 280px;
+    }
+
+    .field-hint {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: .3rem;
+    }
+
+    /* Tags input */
+    .tags-input-wrap {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 6px;
+      padding: .5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      min-height: 46px;
+      transition: all .3s;
+      cursor: text;
+    }
+
+    .tags-input-wrap:focus-within {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, .08);
+    }
+
+    .tag-pill {
+      background: rgba(0, 255, 136, .12);
+      border: 1px solid rgba(0, 255, 136, .25);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: .72rem;
+      padding: .15rem .55rem;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+    }
+
+    .tag-pill.blue-pill {
+      background: rgba(0, 191, 255, .12);
+      border-color: rgba(0, 191, 255, .25);
+      color: var(--blue);
+    }
+
+    .tag-pill button {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      opacity: .7;
+    }
+
+    .tag-pill button:hover {
+      opacity: 1;
+    }
+
+    .tags-real-input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .8rem;
+      flex: 1;
+      min-width: 80px;
+    }
+
+    /* Steps list builder */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      margin-bottom: .5rem;
+    }
+
+    .step-row {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    .step-row input {
+      flex: 1;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 6px;
+      padding: .55rem .8rem;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .8rem;
+      outline: none;
+      transition: .3s;
+    }
+
+    .step-row input:focus {
+      border-color: var(--green);
+    }
+
+    .step-row .step-num {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--green);
+      min-width: 22px;
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: .45rem .65rem;
+      font-size: .8rem;
+      transition: .3s;
+      line-height: 1;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .btn-add-step {
+      background: rgba(0, 255, 136, .06);
+      border: 1px dashed rgba(0, 255, 136, .3);
+      border-radius: 6px;
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: .75rem;
+      letter-spacing: 1px;
+      padding: .5rem 1rem;
+      cursor: pointer;
+      transition: .3s;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-add-step:hover {
+      background: rgba(0, 255, 136, .1);
+    }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 8px;
+      padding: .85rem 1rem;
+    }
+
+    .toggle-label {
+      font-size: .88rem;
+      color: var(--text);
+    }
+
+    .toggle-sub {
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, .1);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: .3s;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--muted);
+      border-radius: 50%;
+      transition: .3s;
+    }
+
+    .toggle input:checked+.slider {
+      background: rgba(0, 255, 136, .25);
+    }
+
+    .toggle input:checked+.slider::before {
+      transform: translateX(20px);
+      background: var(--green);
+    }
+
+    /* Submit actions */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-submit {
+      flex: 1;
+      background: var(--green);
+      color: #050810;
+      border: none;
+      padding: .95rem 2rem;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      min-width: 180px;
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 0 30px rgba(0, 255, 136, .4);
+      transform: translateY(-2px);
+    }
+
+    .btn-submit:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-draft {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .15);
+      color: var(--muted);
+      padding: .95rem 1.5rem;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: .78rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .3s;
+    }
+
+    .btn-draft:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .btn-draft:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* Recent posts table */
+    .recent-section {
+      margin-top: 3rem;
+      border-top: 1px solid rgba(255, 255, 255, .06);
+      padding-top: 2rem;
+    }
+
+    .recent-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .recent-table th {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: left;
+      padding: .5rem .75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .recent-table td {
+      padding: .65rem .75rem;
+      font-size: .82rem;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255, 255, 255, .03);
+      vertical-align: middle;
+    }
+
+    .recent-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .recent-table tr:hover td {
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .type-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: .4rem;
+    }
+
+    .dot-blog {
+      background: var(--blue);
+    }
+
+    .dot-wu {
+      background: var(--green);
+    }
+
+    .status-badge {
+      font-family: var(--mono);
+      font-size: .65rem;
+      padding: .15rem .5rem;
+      border-radius: 20px;
+      letter-spacing: 1px;
+    }
+
+    .status-pub {
+      background: rgba(0, 255, 136, .12);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 136, .2);
+    }
+
+    .status-draft {
+      background: rgba(100, 116, 139, .12);
+      color: var(--muted);
+      border: 1px solid rgba(100, 116, 139, .2);
+    }
+
+    .table-empty {
+      text-align: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .8rem;
+      padding: 2rem;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ════════════════════════════════
+     LOGIN PAGE
+════════════════════════════════ -->
+  <div id="loginPage">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-text">FM<span>U</span>.sec</div>
+        <div class="logo-sub">Admin Panel</div>
+      </div>
+      <p class="login-title">// <span>Secure</span> Access</p>
+
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">Email Address</label>
+        <input class="form-input" id="loginEmail" type="email" placeholder="admin@example.com"
+          autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Password</label>
+        <input class="form-input" id="loginPassword" type="password" placeholder="••••••••"
+          autocomplete="current-password" />
+      </div>
+
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">Login →</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+     DASHBOARD PAGE
+════════════════════════════════ -->
+  <div id="dashPage">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="topbar-logo">FM<span>U</span>.admin</div>
+      <div class="topbar-right">
+        <div class="admin-badge">Logged in as <span id="adminName">—</span></div>
+        <button class="btn-logout" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="dash-body">
+
+      <!-- Step 1: Choose content type -->
+      <div class="step-header">
+        <span class="step-tag">// Create Content</span>
+        <h1 class="step-title">What do you want to <span>publish?</span></h1>
+      </div>
+
+      <div class="type-grid">
+        <div class="type-card blog-type" id="cardBlog" onclick="selectType('blog')">
+          <div class="type-check" id="checkBlog">✓</div>
+          <div class="type-icon">📝</div>
+          <div class="type-name">Blog Post</div>
+          <div class="type-desc">Write a cybersecurity article, tutorial, or web development post for your blog.</div>
+        </div>
+        <div class="type-card wu-type" id="cardWriteup" onclick="selectType('writeup')">
+          <div class="type-check" id="checkWriteup">✓</div>
+          <div class="type-icon">🏴</div>
+          <div class="type-name">CTF / Writeup</div>
+          <div class="type-desc">Document a TryHackMe room, HackTheBox machine, or VAPT engagement writeup.</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- ── BLOG FORM ── -->
+      <div class="form-section" id="blogForm">
+        <div class="section-heading">Blog Post Details</div>
+
+        <div class="form-group">
+          <label class="form-label">Post Title *</label>
+          <input class="form-input" id="bTitle" placeholder="e.g. SQL Injection in Real Banking Systems" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-select" id="bCategory">
+              <option value="">— Select —</option>
+              <option value="cybersecurity">Cybersecurity</option>
+              <option value="webdev">Web Dev</option>
+              <option value="ctf">CTF Writeup</option>
+              <option value="tutorial">Tutorial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Read Time (min) *</label>
+            <input class="form-input" id="bReadTime" type="number" min="1" max="120" placeholder="7" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cover Emoji</label>
+          <input class="form-input" id="bEmoji" placeholder="💉" style="max-width:120px" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Excerpt / Summary *</label>
+          <textarea class="form-textarea" id="bExcerpt" rows="2"
+            placeholder="A one or two sentence teaser for the post..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <div class="tags-input-wrap" id="bTagsWrap" onclick="focusTags('bTagsInput')">
+            <input class="tags-real-input" id="bTagsInput" placeholder="Type tag + Enter" />
+          </div>
+          <div class="field-hint">Press Enter or comma to add a tag</div>
+          <input type="hidden" id="bTagsHidden" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Content (Markdown / HTML) *</label>
+          <textarea class="form-textarea content-area" id="bContent"
+            placeholder="## Introduction&#10;&#10;Write your full article content here. Supports HTML and Markdown-style headings."></textarea>
+          <div class="field-hint">You can use HTML tags like &lt;h3&gt;, &lt;p&gt;,
+            &lt;pre&gt;&lt;code&gt;...&lt;/code&gt;&lt;/pre&gt;</div>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Publish immediately</div>
+            <div class="toggle-sub">Off = saved as draft</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="bPublish" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-submit" id="bSubmitBtn" onclick="submitBlog(true)">Publish Post</button>
+          <button class="btn-draft" id="bDraftBtn" onclick="submitBlog(false)">Save as Draft</button>
+        </div>
+      </div>
+
+      <!-- ── WRITEUP FORM ── -->
+      <div class="form-section" id="writeupForm">
+        <div class="section-heading">Writeup Details</div>
+
+        <div class="form-group">
+          <label class="form-label">Title *</label>
+          <input class="form-input" id="wTitle" placeholder="e.g. Linux Privilege Escalation — SUID Abuse" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Platform *</label>
+            <select class="form-select" id="wPlatform">
+              <option value="">— Select —</option>
+              <option value="tryhackme">TryHackMe</option>
+              <option value="hackthebox">HackTheBox</option>
+              <option value="ctf">CTF Competition</option>
+              <option value="vapt">VAPT Engagement</option>
+              <option value="custom">Custom / Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Difficulty *</label>
+            <select class="form-select" id="wDifficulty">
+              <option value="">— Select —</option>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+              <option value="insane">Insane</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Summary *</label>
+          <textarea class="form-textarea" id="wSummary" rows="2"
+            placeholder="One or two sentences describing what you did and what you found..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <div class="tags-input-wrap" id="wTagsWrap" onclick="focusTags('wTagsInput')">
+            <input class="tags-real-input" id="wTagsInput" placeholder="e.g. SQLi · PrivEsc + Enter" />
+          </div>
+          <div class="field-hint">Press Enter or comma to add a tag</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tools Used</label>
+          <div class="tags-input-wrap" id="wToolsWrap" onclick="focusTags('wToolsInput')">
+            <input class="tags-real-input" id="wToolsInput" placeholder="e.g. Nmap · Burp Suite + Enter" />
+          </div>
+          <div class="field-hint">Press Enter or comma to add a tool</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Attack / Exploitation Steps</label>
+          <div class="steps-list" id="stepsList"></div>
+          <button class="btn-add-step" onclick="addStep()">+ Add Step</button>
+          <div class="field-hint">Each bullet becomes a numbered step in the writeup</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Writeup Content (HTML / Markdown) *</label>
+          <textarea class="form-textarea content-area" id="wContent"
+            placeholder="## Overview&#10;&#10;Write the detailed technical writeup here...&#10;&#10;## Reconnaissance&#10;&#10;&lt;pre&gt;&lt;code&gt;nmap -sV -p- target&lt;/code&gt;&lt;/pre&gt;"></textarea>
+          <div class="field-hint">Supports HTML. Use &lt;pre&gt;&lt;code&gt; blocks for commands.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Flag (optional)</label>
+          <input class="form-input" id="wFlag" placeholder="THM{...} or HTB{...}" style="font-family:var(--code)" />
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Publish immediately</div>
+            <div class="toggle-sub">Off = saved as draft</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="wPublish" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-submit" id="wSubmitBtn" onclick="submitWriteup(true)">Publish Writeup</button>
+          <button class="btn-draft" id="wDraftBtn" onclick="submitWriteup(false)">Save as Draft</button>
+        </div>
+      </div>
+
+      <!-- Recent posts -->
+      <div class="recent-section" id="recentSection" style="display:none">
+        <div class="section-heading">Recent Posts</div>
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recentBody">
+            <tr>
+              <td colspan="5" class="table-empty">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+
+    /* ══════════════════════════
+       TOAST
+    ══════════════════════════ */
+    function showToast(msg, type = 'success', dur = 3500) {
+      const t = document.getElementById('toast');
+      t.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => { t.className = 'toast'; }, dur);
+    }
+
+    /* ══════════════════════════
+       AUTH
+    ══════════════════════════ */
+    function getToken() { return localStorage.getItem('admin_token'); }
+    function setToken(t) { localStorage.setItem('admin_token', t); }
+    function clearToken() { localStorage.removeItem('admin_token'); localStorage.removeItem('admin_name'); }
+
+    async function doLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
+
+      errEl.style.display = 'none';
+      if (!email || !password) { errEl.textContent = 'Please enter email and password.'; errEl.style.display = 'block'; return; }
+
+      btn.textContent = 'Logging in...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Invalid credentials');
+
+        setToken(json.token);
+        localStorage.setItem('admin_name', json.admin.name);
+        showDash(json.admin.name);
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.textContent = 'Login →';
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('loginPassword').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    function doLogout() {
+      clearToken();
+      document.getElementById('dashPage').style.display = 'none';
+      document.getElementById('loginPage').style.display = 'flex';
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+    }
+
+    function showDash(name) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashPage').style.display = 'block';
+      document.getElementById('adminName').textContent = name || localStorage.getItem('admin_name') || 'Admin';
+      loadRecent();
+    }
+
+    /* auto-login if token exists */
+    (async () => {
+      const tok = getToken();
+      if (!tok) return;
+      try {
+        const res = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${tok}` } });
+        const json = await res.json();
+        if (json.success) showDash(json.admin.name);
+        else clearToken();
+      } catch { clearToken(); }
+    })();
+
+    /* ══════════════════════════
+       TYPE SELECTION
+    ══════════════════════════ */
+    let selectedType = null;
+
+    function selectType(type) {
+      selectedType = type;
+      document.getElementById('cardBlog').classList.toggle('selected', type === 'blog');
+      document.getElementById('cardWriteup').classList.toggle('selected', type === 'writeup');
+      document.getElementById('blogForm').classList.toggle('active', type === 'blog');
+      document.getElementById('writeupForm').classList.toggle('active', type === 'writeup');
+
+      if (type === 'writeup' && document.getElementById('stepsList').children.length === 0) {
+        addStep(); // start with one empty step
+      }
+    }
+
+    /* ══════════════════════════
+       TAGS INPUT
+    ══════════════════════════ */
+    const tagStores = {};
+
+    function initTagInput(inputId, wrapId, color = 'green') {
+      const input = document.getElementById(inputId);
+      const wrap = document.getElementById(wrapId);
+      tagStores[inputId] = [];
+
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          const val = input.value.trim().replace(/,$/, '');
+          if (val && !tagStores[inputId].includes(val)) {
+            tagStores[inputId].push(val);
+            renderTag(val, inputId, wrapId, color);
+          }
+          input.value = '';
+        }
+        if (e.key === 'Backspace' && !input.value && tagStores[inputId].length) {
+          const last = tagStores[inputId].pop();
+          const pills = wrap.querySelectorAll('.tag-pill');
+          if (pills.length) pills[pills.length - 1].remove();
+        }
+      });
+    }
+
+    function renderTag(val, inputId, wrapId, color) {
+      const wrap = document.getElementById(wrapId);
+      const input = document.getElementById(inputId);
+      const pill = document.createElement('div');
+      pill.className = `tag-pill ${color === 'blue' ? 'blue-pill' : ''}`;
+      pill.innerHTML = `${val}<button onclick="removeTag('${val}','${inputId}','${wrapId}',this)" title="Remove">×</button>`;
+      wrap.insertBefore(pill, input);
+    }
+
+    function removeTag(val, inputId, wrapId, btn) {
+      tagStores[inputId] = tagStores[inputId].filter(t => t !== val);
+      btn.parentElement.remove();
+    }
+
+    function focusTags(inputId) { document.getElementById(inputId).focus(); }
+
+    initTagInput('bTagsInput', 'bTagsWrap', 'green');
+    initTagInput('wTagsInput', 'wTagsWrap', 'green');
+    initTagInput('wToolsInput', 'wToolsWrap', 'blue');
+
+    /* ══════════════════════════
+       STEPS BUILDER
+    ══════════════════════════ */
+    let stepCount = 0;
+
+    function addStep(val = '') {
+      stepCount++;
+      const list = document.getElementById('stepsList');
+      const row = document.createElement('div');
+      row.className = 'step-row';
+      row.dataset.id = stepCount;
+      row.innerHTML = `
+      <span class="step-num">${list.children.length + 1}.</span>
+      <input type="text" placeholder="e.g. Ran nmap -sV -p- target → found port 22, 80" value="${val}" />
+      <button class="btn-icon" onclick="this.parentElement.remove(); renumberSteps();" title="Remove">×</button>`;
+      list.appendChild(row);
+    }
+
+    function renumberSteps() {
+      document.querySelectorAll('#stepsList .step-row').forEach((r, i) => {
+        r.querySelector('.step-num').textContent = `${i + 1}.`;
+      });
+    }
+
+    function getSteps() {
+      return [...document.querySelectorAll('#stepsList .step-row input')]
+        .map(i => i.value.trim()).filter(Boolean);
+    }
+
+    /* ══════════════════════════
+       SUBMIT BLOG
+    ══════════════════════════ */
+    async function submitBlog(publish) {
+      const title = document.getElementById('bTitle').value.trim();
+      const category = document.getElementById('bCategory').value;
+      const excerpt = document.getElementById('bExcerpt').value.trim();
+      const content = document.getElementById('bContent').value.trim();
+      const readTime = parseInt(document.getElementById('bReadTime').value) || 5;
+      const emoji = document.getElementById('bEmoji').value.trim() || '📝';
+      const tags = tagStores['bTagsInput'] || [];
+
+      if (!title) { showToast('Title is required', 'error'); return; }
+      if (!category) { showToast('Please select a category', 'error'); return; }
+      if (!excerpt) { showToast('Excerpt / summary is required', 'error'); return; }
+      if (!content) { showToast('Content is required', 'error'); return; }
+
+      setBtns('b', true);
+      try {
+        const res = await fetch(`${API}/blogs`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({ title, category, excerpt, content, read_time_min: readTime, cover_emoji: emoji, tags, published: publish }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Failed to save');
+        showToast(publish ? 'Blog post published!' : 'Draft saved!');
+        resetBlogForm();
+        loadRecent();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        setBtns('b', false);
+      }
+    }
+
+    /* ══════════════════════════
+       SUBMIT WRITEUP
+    ══════════════════════════ */
+    async function submitWriteup(publish) {
+      const title = document.getElementById('wTitle').value.trim();
+      const platform = document.getElementById('wPlatform').value;
+      const difficulty = document.getElementById('wDifficulty').value;
+      const summary = document.getElementById('wSummary').value.trim();
+      const content = document.getElementById('wContent').value.trim();
+      const flag = document.getElementById('wFlag').value.trim();
+      const tags = tagStores['wTagsInput'] || [];
+      const tools = tagStores['wToolsInput'] || [];
+      const steps = getSteps();
+
+      if (!title) { showToast('Title is required', 'error'); return; }
+      if (!platform) { showToast('Please select a platform', 'error'); return; }
+      if (!difficulty) { showToast('Please select a difficulty', 'error'); return; }
+      if (!summary) { showToast('Summary is required', 'error'); return; }
+      if (!content) { showToast('Full content is required', 'error'); return; }
+
+      setBtns('w', true);
+      try {
+        const res = await fetch(`${API}/writeups`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({ title, platform, difficulty, summary, content, tags, tools_used: tools, steps, flag: flag || undefined, published: publish }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Failed to save');
+        showToast(publish ? 'Writeup published!' : 'Draft saved!');
+        resetWriteupForm();
+        loadRecent();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        setBtns('w', false);
+      }
+    }
+
+    /* ══════════════════════════
+       HELPERS
+    ══════════════════════════ */
+    function setBtns(prefix, disabled) {
+      const s = document.getElementById(`${prefix}SubmitBtn`);
+      const d = document.getElementById(`${prefix}DraftBtn`);
+      s.disabled = d.disabled = disabled;
+      if (prefix === 'b') s.textContent = disabled ? 'Publishing...' : 'Publish Post';
+      else s.textContent = disabled ? 'Publishing...' : 'Publish Writeup';
+      d.textContent = disabled ? 'Saving...' : 'Save as Draft';
+    }
+
+    function resetBlogForm() {
+      ['bTitle', 'bExcerpt', 'bContent', 'bEmoji', 'bReadTime'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('bCategory').value = '';
+      document.getElementById('bPublish').checked = false;
+      document.getElementById('bTagsWrap').querySelectorAll('.tag-pill').forEach(p => p.remove());
+      tagStores['bTagsInput'] = [];
+    }
+
+    function resetWriteupForm() {
+      ['wTitle', 'wSummary', 'wContent', 'wFlag'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('wPlatform').value = '';
+      document.getElementById('wDifficulty').value = '';
+      document.getElementById('wPublish').checked = false;
+      document.getElementById('stepsList').innerHTML = '';
+      stepCount = 0;
+      ['wTagsWrap', 'wToolsWrap'].forEach(id => {
+        document.getElementById(id).querySelectorAll('.tag-pill').forEach(p => p.remove());
+      });
+      tagStores['wTagsInput'] = tagStores['wToolsInput'] = [];
+      addStep();
+    }
+
+    /* ══════════════════════════
+       RECENT POSTS TABLE
+    ══════════════════════════ */
+    async function loadRecent() {
+      document.getElementById('recentSection').style.display = 'block';
+      const tbody = document.getElementById('recentBody');
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Loading...</td></tr>';
+      try {
+        const tok = getToken();
+        const headers = { Authorization: `Bearer ${tok}` };
+        const [bRes, wRes] = await Promise.all([
+          fetch(`${API}/blogs/admin/all`, { headers }),
+          fetch(`${API}/writeups`, { headers }),
+        ]);
+        const bJson = await bRes.json();
+        const wJson = await wRes.json();
+
+        const blogs = (bJson.data || []).map(p => ({ ...p, _type: 'blog' }));
+        const writeups = (wJson.data || []).map(w => ({ ...w, _type: 'writeup' }));
+        const all = [...blogs, ...writeups].sort((a, b) =>
+          new Date(b.created_at || b.published_at) - new Date(a.created_at || a.published_at)
+        ).slice(0, 10);
+
+        if (!all.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No posts yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = all.map(p => {
+          const date = new Date(p.created_at || p.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const dotClass = p._type === 'blog' ? 'dot-blog' : 'dot-wu';
+          const label = p._type === 'blog' ? 'Blog' : 'Writeup';
+          const pub = p.published;
+          return `<tr>
+          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</td>
+          <td><span class="type-dot ${dotClass}"></span>${label}</td>
+          <td><span class="status-badge ${pub ? 'status-pub' : 'status-draft'}">${pub ? 'Published' : 'Draft'}</span></td>
+          <td style="color:var(--muted);font-family:var(--mono);font-size:.75rem">${date}</td>
+          <td><button class="btn-icon" onclick="deletePost('${p.id}', '${p._type}')" title="Delete">🗑️</button></td>
+        </tr>`;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="table-empty" style="color:var(--red)">Failed to load: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function deletePost(id, type) {
+      if (!confirm('Are you sure you want to delete this post?')) return;
+      try {
+        const endpoint = type === 'blog' ? '/blogs/' : '/writeups/';
+        const res = await fetch(API + endpoint + id, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Failed to delete');
+        showToast('Post deleted successfully');
+        loadRecent();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+
+</html>
