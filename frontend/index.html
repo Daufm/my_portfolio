@@ -7,6 +7,7 @@
   <title>Fuad Mohammed Umer | Full-Stack & Cybersecurity Engineer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
     rel="stylesheet" />
@@ -2779,32 +2780,37 @@
       }
     }
 
-    /* ===== OPEN BLOG BY SLUG (from API) ===== */
-    async function openBlogBySlug(slug) {
-      document.getElementById('blogModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-      document.getElementById('blogModalContent').innerHTML = `
-        <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono)">Loading...</div>`;
-      try {
-        const res = await fetch(`${API_BASE}/blogs/${slug}`);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.message);
-        const post = json.data;
-        const date = post.published_at
-          ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-          : '';
-        document.getElementById('blogModalContent').innerHTML = `
-          <div class="blog-modal-meta">
-            <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${post.category}</span>
-            <span style="font-size:.8rem;color:var(--muted);font-family:var(--mono)">${date}</span>
-          </div>
-          <h2 class="blog-modal-title">${post.title}</h2>
-          <div class="blog-modal-content">${post.content}</div>`;
-      } catch (err) {
-        document.getElementById('blogModalContent').innerHTML =
-          `<p style="color:var(--muted);font-family:var(--mono)">⚠️ Failed to load post: ${err.message}</p>`;
-      }
-    }
+ 
+   /* ===== OPEN BLOG BY SLUG (from API) ===== */
+async function openBlogBySlug(slug) {
+  document.getElementById('blogModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('blogModalContent').innerHTML = `
+    <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono)">Loading...</div>`;
+  try {
+    const res = await fetch(`${API_BASE}/blogs/${slug}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message);
+    const post = json.data;
+    const date = post.published_at
+      ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+      : '';
+
+    // 👇 1. Parse your markdown string into clean HTML tags before rendering
+    const cleanHTML = marked.parse(post.content);
+
+    document.getElementById('blogModalContent').innerHTML = `
+      <div class="blog-modal-meta">
+        <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${post.category}</span>
+        <span style="font-size:.8rem;color:var(--muted);font-family:var(--mono)">${date}</span>
+      </div>
+      <h2 class="blog-modal-title">${post.title}</h2>
+      <div class="blog-modal-content">${cleanHTML}</div>`; // 👈 2. Injected parsed HTML instead of post.content
+  } catch (err) {
+    document.getElementById('blogModalContent').innerHTML =
+      `<p style="color:var(--muted);font-family:var(--mono)">⚠️ Failed to load post: ${err.message}</p>`;
+  }
+}
 
     /* ===== LEGACY openBlog (static fallback keys) ===== */
     const blogPosts = {
