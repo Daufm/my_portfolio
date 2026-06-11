@@ -36,6 +36,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization'],
 }));
 
+//trust render proxy
+app.set('trust proxy', 1);
+
 // Global rate limiter — 100 req / 15 min
 const globalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
