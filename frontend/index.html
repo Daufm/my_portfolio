@@ -2225,151 +2225,8 @@
           <span class="thm-badge">⚡ Top 5% on TryHackMe</span>
         </div>
       </div>
-      <div class="writeups-grid">
-
-        <div class="writeup-card reveal" onclick="toggleWriteup(this)">
-          <div class="writeup-header">
-            <div>
-              <div class="writeup-meta">
-                <span class="diff-badge diff-medium">Medium</span>
-                <div class="about-tags" style="margin:0"><span class="tag tag-blue"
-                    style="font-size:.65rem;padding:.15rem .5rem">Web</span><span class="tag tag-purple"
-                    style="font-size:.65rem;padding:.15rem .5rem">SQLi</span></div>
-              </div>
-              <div class="writeup-title">SQL Injection — Banking Login Bypass</div>
-              <div class="writeup-summary">Classic blind SQL injection on a login endpoint leading to full account
-                takeover via boolean-based extraction.</div>
-            </div>
-            <span class="writeup-expand">▼</span>
-          </div>
-          <div class="writeup-body">
-            <div class="writeup-content">
-              <ul class="writeup-steps">
-                <li>Reconnaissance: identified login form with no prepared statements</li>
-                <li>Payload: <code
-                    style="font-family:var(--code);color:var(--green);font-size:.78rem">admin' OR '1'='1' --</code>
-                  confirmed injectable field</li>
-                <li>Boolean-based blind extraction: enumerated database schema</li>
-                <li>Dumped credential table and cracked MD5 hashes offline</li>
-                <li>Escalated to admin panel via extracted admin hash</li>
-              </ul>
-              <div class="writeup-tags">
-                <span class="tag tag-blue">TryHackMe</span>
-                <span class="tag tag-purple">SQLMap</span>
-                <span class="tag tag-green">Burp Suite</span>
-              </div>
-              <a href="#blog" class="writeup-btn">Read Full Writeup →</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="writeup-card reveal" onclick="toggleWriteup(this)">
-          <div class="writeup-header">
-            <div>
-              <div class="writeup-meta">
-                <span class="diff-badge diff-hard">Hard</span>
-                <div class="about-tags" style="margin:0"><span class="tag tag-green"
-                    style="font-size:.65rem;padding:.15rem .5rem">PrivEsc</span><span class="tag tag-blue"
-                    style="font-size:.65rem;padding:.15rem .5rem">Linux</span></div>
-              </div>
-              <div class="writeup-title">Linux Privilege Escalation — SUID Abuse</div>
-              <div class="writeup-summary">Chained vulnerability from CVE exploitation to SUID binary abuse achieving
-                root on a hardened Ubuntu server.</div>
-            </div>
-            <span class="writeup-expand">▼</span>
-          </div>
-          <div class="writeup-body">
-            <div class="writeup-content">
-              <ul class="writeup-steps">
-                <li>Initial foothold via outdated Apache module (CVE-2021-41773)</li>
-                <li>Stabilized shell: python3 pty + stty raw -echo</li>
-                <li>Enumeration with LinPEAS — found SUID on <code
-                    style="font-family:var(--code);color:var(--green);font-size:.78rem">/usr/bin/find</code></li>
-                <li>GTFOBins exploit: <code
-                    style="font-family:var(--code);color:var(--green);font-size:.78rem">find . -exec /bin/sh \;</code>
-                </li>
-                <li>Root achieved — captured flag from /root/root.txt</li>
-              </ul>
-              <div class="writeup-tags">
-                <span class="tag tag-green">TryHackMe</span>
-                <span class="tag tag-blue">GTFOBins</span>
-                <span class="tag tag-purple">LinPEAS</span>
-              </div>
-              <a href="#blog" class="writeup-btn">Read Full Writeup →</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="writeup-card reveal" onclick="toggleWriteup(this)">
-          <div class="writeup-header">
-            <div>
-              <div class="writeup-meta">
-                <span class="diff-badge diff-medium">Medium</span>
-                <div class="about-tags" style="margin:0"><span class="tag tag-yellow"
-                    style="font-size:.65rem;padding:.15rem .5rem">Forensics</span><span class="tag tag-purple"
-                    style="font-size:.65rem;padding:.15rem .5rem">Network</span></div>
-              </div>
-              <div class="writeup-title">Network Forensics — PCAP Analysis</div>
-              <div class="writeup-summary">Analyzed a suspicious .pcap file from an assumed-compromised host to
-                reconstruct an attacker's lateral movement path.</div>
-            </div>
-            <span class="writeup-expand">▼</span>
-          </div>
-          <div class="writeup-body">
-            <div class="writeup-content">
-              <ul class="writeup-steps">
-                <li>Opened capture in Wireshark, applied <code
-                    style="font-family:var(--code);color:var(--green);font-size:.78rem">http.request.method == POST</code>
-                  filter</li>
-                <li>Identified data exfiltration over DNS tunneling</li>
-                <li>Decoded base64 payloads in DNS TXT records</li>
-                <li>Reconstructed attacker's C2 communication timeline</li>
-                <li>Identified compromised credentials sent in cleartext</li>
-              </ul>
-              <div class="writeup-tags">
-                <span class="tag tag-blue">Wireshark</span>
-                <span class="tag tag-green">TryHackMe</span>
-                <span class="tag tag-purple">DNS Forensics</span>
-              </div>
-              <a href="#blog" class="writeup-btn">Read Full Writeup →</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="writeup-card reveal" onclick="toggleWriteup(this)">
-          <div class="writeup-header">
-            <div>
-              <div class="writeup-meta">
-                <span class="diff-badge diff-insane">Insane</span>
-                <div class="about-tags" style="margin:0"><span class="tag tag-blue"
-                    style="font-size:.65rem;padding:.15rem .5rem">Web</span><span class="tag tag-green"
-                    style="font-size:.65rem;padding:.15rem .5rem">Active Directory</span></div>
-              </div>
-              <div class="writeup-title">HackTheBox — AD Environment Takeover</div>
-              <div class="writeup-summary">Full domain compromise via Kerberoasting, Pass-the-Hash, and DCSync attack
-                chain on an enterprise-grade AD lab.</div>
-            </div>
-            <span class="writeup-expand">▼</span>
-          </div>
-          <div class="writeup-body">
-            <div class="writeup-content">
-              <ul class="writeup-steps">
-                <li>Initial SMB enumeration — identified guest credentials</li>
-                <li>Kerberoasting with Impacket to extract TGS tickets</li>
-                <li>Offline crack with Hashcat → obtained service account password</li>
-                <li>Pass-the-Hash lateral movement to Domain Controller</li>
-                <li>DCSync attack — extracted NTDS.dit and KRBTGT hash</li>
-              </ul>
-              <div class="writeup-tags">
-                <span class="tag tag-purple">HackTheBox</span>
-                <span class="tag tag-green">Impacket</span>
-                <span class="tag tag-blue">Hashcat</span>
-              </div>
-              <a href="#blog" class="writeup-btn">Read Full Writeup →</a>
-            </div>
-          </div>
-        </div>
-
+      <div class="writeups-grid" id="writeupsGrid">
+        <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono);grid-column:1/-1;">Loading writeups...</div>
       </div>
     </div>
   </section>
@@ -3025,9 +2882,116 @@ app.use(cors({
       });
     }, { passive: true });
 
+    /* ===== LOAD WRITEUPS FROM API ===== */
+    async function loadWriteups() {
+      const grid = document.getElementById('writeupsGrid');
+      if (!grid) return;
+      const diffClasses = { easy: 'diff-easy', medium: 'diff-medium', hard: 'diff-hard', insane: 'diff-insane' };
+      const diffLabels = { easy: 'Easy', medium: 'Medium', hard: 'Hard', insane: 'Insane' };
+      
+      try {
+        const res = await fetch(`${API_BASE}/writeups`);
+        const json = await res.json();
+        if (!json.success || !json.data.length) return;
+        grid.innerHTML = '';
+        
+        json.data.forEach(w => {
+          // Top tags (from w.tags)
+          const topTags = (w.tags || []).map((t, idx) => {
+            const colors = ['tag-blue', 'tag-purple', 'tag-green', 'tag-yellow'];
+            const colorClass = colors[idx % colors.length];
+            return `<span class="tag ${colorClass}" style="font-size:.65rem;padding:.15rem .5rem">${t}</span>`;
+          }).join('');
+          
+          // Steps list
+          const stepsList = (w.steps || []).map(step => `<li>${step}</li>`).join('');
+          
+          // Bottom tags (Platform + Tools Used)
+          const capitalizedPlatform = w.platform === 'tryhackme' ? 'TryHackMe' : 
+                                      w.platform === 'hackthebox' ? 'HackTheBox' : 
+                                      w.platform === 'ctf' ? 'CTF' :
+                                      w.platform === 'vapt' ? 'VAPT' :
+                                      w.platform.charAt(0).toUpperCase() + w.platform.slice(1);
+          const bottomTags = [`<span class="tag tag-blue">${capitalizedPlatform}</span>`]
+            .concat((w.tools_used || []).map((tool, idx) => {
+              const colors = ['tag-purple', 'tag-green', 'tag-blue', 'tag-yellow'];
+              const colorClass = colors[idx % colors.length];
+              return `<span class="tag ${colorClass}">${tool}</span>`;
+            })).join('');
+            
+          const card = document.createElement('div');
+          card.className = 'writeup-card reveal';
+          card.onclick = () => toggleWriteup(card);
+          
+          card.innerHTML = `
+            <div class="writeup-header">
+              <div>
+                <div class="writeup-meta">
+                  <span class="diff-badge ${diffClasses[w.difficulty] || 'diff-medium'}">${diffLabels[w.difficulty] || 'Medium'}</span>
+                  <div class="about-tags" style="margin:0">${topTags}</div>
+                </div>
+                <div class="writeup-title">${w.title}</div>
+                <div class="writeup-summary">${w.summary}</div>
+              </div>
+              <span class="writeup-expand">▼</span>
+            </div>
+            <div class="writeup-body">
+              <div class="writeup-content" onclick="event.stopPropagation()">
+                <ul class="writeup-steps">
+                  ${stepsList}
+                </ul>
+                <div class="writeup-tags">
+                  ${bottomTags}
+                </div>
+                <button class="writeup-btn" onclick="openWriteup('${w.id}')" style="cursor:pointer;">Read Full Writeup →</button>
+              </div>
+            </div>`;
+          grid.appendChild(card);
+        });
+        
+        // Re-observe newly created cards for scroll animation
+        grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+      } catch (err) {
+        console.warn('Writeups API unavailable — using static content:', err.message);
+      }
+    }
+
+    async function openWriteup(id) {
+      document.getElementById('blogModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('blogModalContent').innerHTML = `
+        <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono)">Loading...</div>`;
+      try {
+        const res = await fetch(`${API_BASE}/writeups/${id}`);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+        const w = json.data;
+        const date = new Date(w.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        const cleanHTML = marked.parse(w.content);
+        
+        const capitalizedPlatform = w.platform === 'tryhackme' ? 'TryHackMe' : 
+                                    w.platform === 'hackthebox' ? 'HackTheBox' : 
+                                    w.platform === 'ctf' ? 'CTF' :
+                                    w.platform === 'vapt' ? 'VAPT' :
+                                    w.platform.charAt(0).toUpperCase() + w.platform.slice(1);
+        
+        document.getElementById('blogModalContent').innerHTML = `
+          <div class="blog-modal-meta">
+            <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${capitalizedPlatform}</span>
+            <span style="font-size:.8rem;color:var(--muted);font-family:var(--mono)">${date}</span>
+          </div>
+          <h2 class="blog-modal-title">${w.title}</h2>
+          <div class="blog-modal-content">${cleanHTML}</div>`;
+      } catch (err) {
+        document.getElementById('blogModalContent').innerHTML =
+          `<p style="color:var(--muted);font-family:var(--mono)">⚠️ Failed to load writeup: ${err.message}</p>`;
+      }
+    }
+
     /* ===== BOOT: load dynamic data ===== */
     loadProjects();
     loadBlogs();
+    loadWriteups();
   </script>
 </body>
 

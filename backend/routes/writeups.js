@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   const where = conditions.join(' AND ');
   try {
     const result = await query(
-      `SELECT id, title, platform, difficulty, summary, tags, steps, tools_used, views, created_at
+      `SELECT id, title, platform, difficulty, summary, tags, steps, tools_used, published, views, created_at
        FROM writeups WHERE ${where} ORDER BY created_at DESC`,
       params
     );
