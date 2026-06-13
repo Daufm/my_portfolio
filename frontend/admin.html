@@ -636,6 +636,11 @@
       color: var(--red);
     }
 
+    .btn-icon-pub:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
     .btn-add-step {
       background: rgba(0, 255, 136, .06);
       border: 1px dashed rgba(0, 255, 136, .3);
@@ -1440,7 +1445,7 @@
         const headers = { Authorization: `Bearer ${tok}` };
         const [bRes, wRes] = await Promise.all([
           fetch(`${API}/blogs/admin/all`, { headers }),
-          fetch(`${API}/writeups`, { headers }),
+          fetch(`${API}/writeups/admin/all`, { headers }),
         ]);
         const bJson = await bRes.json();
         const wJson = await wRes.json();
@@ -1461,16 +1466,40 @@
           const dotClass = p._type === 'blog' ? 'dot-blog' : 'dot-wu';
           const label = p._type === 'blog' ? 'Blog' : 'Writeup';
           const pub = p.published;
+          const publishBtn = !pub
+            ? `<button class="btn-icon btn-icon-pub" onclick="publishPost('${p.id}', '${p._type}')" title="Publish" style="margin-right: 8px;">🚀</button>`
+            : '';
           return `<tr>
           <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</td>
           <td><span class="type-dot ${dotClass}"></span>${label}</td>
           <td><span class="status-badge ${pub ? 'status-pub' : 'status-draft'}">${pub ? 'Published' : 'Draft'}</span></td>
           <td style="color:var(--muted);font-family:var(--mono);font-size:.75rem">${date}</td>
-          <td><button class="btn-icon" onclick="deletePost('${p.id}', '${p._type}')" title="Delete">🗑️</button></td>
+          <td>${publishBtn}<button class="btn-icon" onclick="deletePost('${p.id}', '${p._type}')" title="Delete">🗑️</button></td>
         </tr>`;
         }).join('');
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="5" class="table-empty" style="color:var(--red)">Failed to load: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function publishPost(id, type) {
+      if (!confirm('Are you sure you want to publish this draft?')) return;
+      try {
+        const endpoint = type === 'blog' ? '/blogs/' : '/writeups/';
+        const res = await fetch(API + endpoint + id, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`
+          },
+          body: JSON.stringify({ published: true })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Failed to publish');
+        showToast('Post published successfully');
+        loadRecent();
+      } catch (err) {
+        showToast(err.message, 'error');
       }
     }
 

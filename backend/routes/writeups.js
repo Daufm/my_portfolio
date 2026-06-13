@@ -29,6 +29,20 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /api/writeups/admin/all ──────────────────────────────
+// Admin only — includes drafts
+router.get('/admin/all', protect, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id, title, platform, difficulty, summary, tags, steps, tools_used, published, views, created_at
+       FROM writeups ORDER BY created_at DESC`
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // ─── GET /api/writeups/:id ───────────────────────────────────
 router.get('/:id', async (req, res) => {
   try {
