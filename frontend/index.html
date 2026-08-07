@@ -1022,8 +1022,9 @@
 
     .writeups-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 1.5rem
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      gap: 1.5rem;
+      align-items: stretch
     }
 
     .writeup-card {
@@ -1031,20 +1032,26 @@
       border: 1px solid rgba(255, 255, 255, .07);
       border-radius: 10px;
       overflow: hidden;
-      transition: all .3s
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: border-color .3s, transform .3s, box-shadow .3s
     }
 
     .writeup-card:hover {
-      border-color: rgba(0, 255, 136, .3)
+      border-color: rgba(0, 255, 136, .3);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0, 255, 136, .08)
     }
 
     .writeup-header {
-      padding: 1.2rem;
+      padding: 1.2rem 1.2rem .85rem;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 1rem
+      gap: 1rem;
+      flex: 1
     }
 
     .writeup-meta {
@@ -1089,13 +1096,22 @@
       font-weight: 600;
       color: var(--text);
       font-family: var(--mono);
-      margin-bottom: .4rem
+      margin-bottom: .4rem;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden
     }
 
     .writeup-summary {
       font-size: .82rem;
       color: var(--muted);
-      line-height: 1.6
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden
     }
 
     .writeup-expand {
@@ -1111,23 +1127,28 @@
     }
 
     .writeup-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .4s ease
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .35s ease
     }
 
     .writeup-card.expanded .writeup-body {
-      max-height: 500px
+      grid-template-rows: 1fr
+    }
+
+    .writeup-body-inner {
+      overflow: hidden;
+      min-height: 0
     }
 
     .writeup-content {
-      padding: 1.2rem;
+      padding: 0 1.2rem 1rem;
       border-top: 1px solid rgba(255, 255, 255, .05)
     }
 
     .writeup-steps {
       list-style: none;
-      margin-bottom: 1rem
+      margin: 1rem 0
     }
 
     .writeup-steps li {
@@ -1150,11 +1171,19 @@
       display: flex;
       gap: .4rem;
       flex-wrap: wrap;
-      margin-bottom: 1rem
+      margin-bottom: .25rem
+    }
+
+    .writeup-footer {
+      padding: .9rem 1.2rem 1.15rem;
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      margin-top: auto
     }
 
     .writeup-btn {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
       padding: .5rem 1.2rem;
       background: rgba(0, 255, 136, .1);
       border: 1px solid var(--green);
@@ -1165,12 +1194,19 @@
       text-decoration: none;
       letter-spacing: 1px;
       text-transform: uppercase;
-      transition: .3s
+      cursor: pointer;
+      transition: background .3s, box-shadow .3s, transform .25s
     }
 
     .writeup-btn:hover {
       background: rgba(0, 255, 136, .2);
-      box-shadow: 0 0 15px rgba(0, 255, 136, .2)
+      box-shadow: 0 0 15px rgba(0, 255, 136, .2);
+      transform: translateX(2px)
+    }
+
+    .writeup-btn.is-placeholder {
+      border-style: dashed;
+      opacity: .85
     }
 
     /* BLOG */
@@ -1209,8 +1245,9 @@
 
     .blog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+      gap: 1.75rem;
+      align-items: stretch
     }
 
     .blog-card {
@@ -1218,24 +1255,39 @@
       border: 1px solid rgba(255, 255, 255, .07);
       border-radius: 12px;
       overflow: hidden;
-      transition: all .4s;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 340px;
+      transition: border-color .35s, transform .35s, box-shadow .35s;
       cursor: pointer
     }
 
     .blog-card:hover {
-      border-color: rgba(0, 191, 255, .3);
-      transform: translateY(-4px);
-      box-shadow: 0 10px 40px rgba(0, 191, 255, .08)
+      border-color: rgba(0, 191, 255, .35);
+      transform: translateY(-6px);
+      box-shadow: 0 14px 36px rgba(0, 191, 255, .1)
+    }
+
+    .blog-card:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 3px
     }
 
     .blog-card-img {
-      height: 160px;
+      height: 148px;
+      flex-shrink: 0;
       position: relative;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem
+      font-size: 2.75rem;
+      transition: transform .4s ease
+    }
+
+    .blog-card:hover .blog-card-img {
+      transform: scale(1.03)
     }
 
     .blog-img-sql {
@@ -1255,14 +1307,18 @@
     }
 
     .blog-card-body {
-      padding: 1.5rem
+      padding: 1.35rem 1.4rem 1.45rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      gap: .65rem
     }
 
     .blog-meta {
       display: flex;
       gap: .75rem;
       align-items: center;
-      margin-bottom: .75rem;
       flex-wrap: wrap
     }
 
@@ -1271,7 +1327,8 @@
       border-radius: 3px;
       font-size: .7rem;
       font-family: var(--mono);
-      text-transform: uppercase
+      text-transform: uppercase;
+      letter-spacing: .4px
     }
 
     .blog-date {
@@ -1284,32 +1341,46 @@
       font-size: 1rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: .6rem;
       line-height: 1.4;
-      font-family: var(--mono)
+      font-family: var(--mono);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden
     }
 
     .blog-excerpt {
       font-size: .82rem;
       color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 1rem
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex: 1
     }
 
     .blog-read {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: .4rem;
+      margin-top: auto;
+      padding-top: .35rem;
       font-family: var(--mono);
       font-size: .75rem;
       color: var(--blue);
       text-transform: uppercase;
-      letter-spacing: 1px
+      letter-spacing: 1px;
+      transition: color .25s
     }
 
     .blog-read::after {
       content: "→";
-      transition: .3s
+      transition: transform .3s
+    }
+
+    .blog-card:hover .blog-read {
+      color: #7dd3fc
     }
 
     .blog-card:hover .blog-read::after {
@@ -2248,61 +2319,61 @@
       </div>
       <div class="blog-grid" id="blogGrid">
 
-        <div class="blog-card reveal" data-cat="cybersecurity" onclick="openBlog('sql')">
-          <div class="blog-card-img blog-img-sql">💉</div>
+        <article class="blog-card reveal" data-cat="cybersecurity" tabindex="0" role="link" onclick="openBlog('sql')" onkeydown="if(event.key==='Enter')openBlog('sql')">
+          <div class="blog-card-img blog-img-sql" aria-hidden="true">💉</div>
           <div class="blog-card-body">
             <div class="blog-meta">
               <span class="blog-cat-badge tag-blue">Cybersecurity</span>
-              <span class="blog-date">Jan 14, 2025</span>
+              <time class="blog-date" datetime="2025-01-14">Jan 14, 2025</time>
             </div>
-            <div class="blog-title">SQL Injection Explained in Real Systems</div>
-            <div class="blog-excerpt">How attackers exploit SQL injection vulnerabilities in production banking systems,
-              with real-world payloads and defense strategies.</div>
-            <div class="blog-read">Read Article</div>
+            <h3 class="blog-title">SQL Injection Explained in Real Systems</h3>
+            <p class="blog-excerpt">How attackers exploit SQL injection vulnerabilities in production banking systems,
+              with real-world payloads and defense strategies.</p>
+            <span class="blog-read">Read Article</span>
           </div>
-        </div>
+        </article>
 
-        <div class="blog-card reveal" data-cat="ctf" onclick="openBlog('thm')">
-          <div class="blog-card-img blog-img-thm">🏆</div>
+        <article class="blog-card reveal" data-cat="ctf" tabindex="0" role="link" onclick="openBlog('thm')" onkeydown="if(event.key==='Enter')openBlog('thm')">
+          <div class="blog-card-img blog-img-thm" aria-hidden="true">🏆</div>
           <div class="blog-card-body">
             <div class="blog-meta">
               <span class="blog-cat-badge tag-green">CTF Writeup</span>
-              <span class="blog-date">Feb 3, 2025</span>
+              <time class="blog-date" datetime="2025-02-03">Feb 3, 2025</time>
             </div>
-            <div class="blog-title">TryHackMe Privilege Escalation Walkthrough</div>
-            <div class="blog-excerpt">Step-by-step guide through a challenging Linux privilege escalation room, from
-              initial foothold to root using SUID exploitation.</div>
-            <div class="blog-read">Read Article</div>
+            <h3 class="blog-title">TryHackMe Privilege Escalation Walkthrough</h3>
+            <p class="blog-excerpt">Step-by-step guide through a challenging Linux privilege escalation room, from
+              initial foothold to root using SUID exploitation.</p>
+            <span class="blog-read">Read Article</span>
           </div>
-        </div>
+        </article>
 
-        <div class="blog-card reveal" data-cat="webdev" onclick="openBlog('api')">
-          <div class="blog-card-img blog-img-api">⚡</div>
+        <article class="blog-card reveal" data-cat="webdev" tabindex="0" role="link" onclick="openBlog('api')" onkeydown="if(event.key==='Enter')openBlog('api')">
+          <div class="blog-card-img blog-img-api" aria-hidden="true">⚡</div>
           <div class="blog-card-body">
             <div class="blog-meta">
               <span class="blog-cat-badge tag-blue">Web Dev</span>
-              <span class="blog-date">Mar 9, 2025</span>
+              <time class="blog-date" datetime="2025-03-09">Mar 9, 2025</time>
             </div>
-            <div class="blog-title">Building Secure APIs with FastAPI</div>
-            <div class="blog-excerpt">Production patterns for securing FastAPI backends — OAuth2, JWT, SQL injection
-              prevention, and comprehensive input validation.</div>
-            <div class="blog-read">Read Article</div>
+            <h3 class="blog-title">Building Secure APIs with FastAPI</h3>
+            <p class="blog-excerpt">Production patterns for securing FastAPI backends — OAuth2, JWT, SQL injection
+              prevention, and comprehensive input validation.</p>
+            <span class="blog-read">Read Article</span>
           </div>
-        </div>
+        </article>
 
-        <div class="blog-card reveal" data-cat="tutorial" onclick="openBlog('vuln')">
-          <div class="blog-card-img blog-img-vuln">🕷️</div>
+        <article class="blog-card reveal" data-cat="tutorial" tabindex="0" role="link" onclick="openBlog('vuln')" onkeydown="if(event.key==='Enter')openBlog('vuln')">
+          <div class="blog-card-img blog-img-vuln" aria-hidden="true">🕷️</div>
           <div class="blog-card-body">
             <div class="blog-meta">
               <span class="blog-cat-badge tag-purple">Tutorial</span>
-              <span class="blog-date">Apr 18, 2025</span>
+              <time class="blog-date" datetime="2025-04-18">Apr 18, 2025</time>
             </div>
-            <div class="blog-title">Common Web Vulnerabilities and Fixes</div>
-            <div class="blog-excerpt">OWASP Top 10 practical breakdown — real examples of XSS, CSRF, IDOR, and broken
-              authentication with hands-on remediation code.</div>
-            <div class="blog-read">Read Article</div>
+            <h3 class="blog-title">Common Web Vulnerabilities and Fixes</h3>
+            <p class="blog-excerpt">OWASP Top 10 practical breakdown — real examples of XSS, CSRF, IDOR, and broken
+              authentication with hands-on remediation code.</p>
+            <span class="blog-read">Read Article</span>
           </div>
-        </div>
+        </article>
 
       </div>
     </div>
@@ -2605,6 +2676,7 @@
       const grid = document.getElementById('blogGrid');
       if (!grid) return;
       const catColors = { cybersecurity: 'tag-blue', webdev: 'tag-blue', ctf: 'tag-green', tutorial: 'tag-purple' };
+      const catLabels = { cybersecurity: 'Cybersecurity', webdev: 'Web Dev', ctf: 'CTF Writeup', tutorial: 'Tutorial' };
       const imgClasses = { cybersecurity: 'blog-img-sql', ctf: 'blog-img-thm', webdev: 'blog-img-api', tutorial: 'blog-img-vuln' };
       const emojis = { cybersecurity: '💉', ctf: '🏆', webdev: '⚡', tutorial: '🕷️' };
       try {
@@ -2613,23 +2685,31 @@
         if (!json.success || !json.data.length) return;
         grid.innerHTML = '';
         json.data.forEach(post => {
-          const date = post.published_at
-            ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+          const dateObj = post.published_at ? new Date(post.published_at) : null;
+          const date = dateObj
+            ? dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
             : '';
-          const card = document.createElement('div');
+          const dateAttr = dateObj && !Number.isNaN(dateObj.getTime())
+            ? dateObj.toISOString().slice(0, 10)
+            : '';
+          const card = document.createElement('article');
           card.className = 'blog-card reveal';
           card.dataset.cat = post.category;
-          card.onclick = () => openBlogBySlug(post.slug);
+          card.tabIndex = 0;
+          card.setAttribute('role', 'link');
+          const open = () => openBlogBySlug(post.slug);
+          card.onclick = open;
+          card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
           card.innerHTML = `
-            <div class="blog-card-img ${imgClasses[post.category] || 'blog-img-sql'}">${post.cover_emoji || emojis[post.category] || '📝'}</div>
+            <div class="blog-card-img ${imgClasses[post.category] || 'blog-img-sql'}" aria-hidden="true">${post.cover_emoji || emojis[post.category] || '📝'}</div>
             <div class="blog-card-body">
               <div class="blog-meta">
-                <span class="blog-cat-badge ${catColors[post.category] || 'tag-blue'}">${post.category}</span>
-                <span class="blog-date">${date}</span>
+                <span class="blog-cat-badge ${catColors[post.category] || 'tag-blue'}">${catLabels[post.category] || post.category}</span>
+                ${date ? `<time class="blog-date"${dateAttr ? ` datetime="${dateAttr}"` : ''}>${date}</time>` : ''}
               </div>
-              <div class="blog-title">${post.title}</div>
-              <div class="blog-excerpt">${post.excerpt}</div>
-              <div class="blog-read">Read Article</div>
+              <h3 class="blog-title">${post.title}</h3>
+              <p class="blog-excerpt">${post.excerpt || ''}</p>
+              <span class="blog-read">Read Article</span>
             </div>`;
           grid.appendChild(card);
         });
@@ -2882,47 +2962,73 @@ app.use(cors({
       });
     }, { passive: true });
 
+    /** Resolve writeup action URL across inconsistent API field names. */
+    function resolveWriteupHref(w) {
+      const candidates = [w.url, w.writeup_url, w.writeup, w.link, w.external_url, w.content_url];
+      for (const value of candidates) {
+        if (typeof value === 'string' && value.trim()) return value.trim();
+      }
+      if (w.id != null && w.id !== '') return null; // internal modal route
+      return '#seclab'; // safe placeholder when nothing is available
+    }
+
+    function buildWriteupAction(w) {
+      const href = resolveWriteupHref(w);
+      const label = 'Read Full Writeup →';
+      if (href && href !== '#seclab' && /^https?:\/\//i.test(href)) {
+        return `<a class="writeup-btn" href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${label}</a>`;
+      }
+      if (w.id != null && w.id !== '') {
+        return `<a class="writeup-btn" href="#seclab" role="button" onclick="event.preventDefault();event.stopPropagation();openWriteup('${w.id}')">${label}</a>`;
+      }
+      return `<a class="writeup-btn is-placeholder" href="#seclab" onclick="event.stopPropagation()">${label}</a>`;
+    }
+
+    function formatPlatform(platform) {
+      if (!platform) return 'Writeup';
+      const map = { tryhackme: 'TryHackMe', hackthebox: 'HackTheBox', ctf: 'CTF', vapt: 'VAPT' };
+      if (map[platform]) return map[platform];
+      return platform.charAt(0).toUpperCase() + platform.slice(1);
+    }
+
     /* ===== LOAD WRITEUPS FROM API ===== */
     async function loadWriteups() {
       const grid = document.getElementById('writeupsGrid');
       if (!grid) return;
       const diffClasses = { easy: 'diff-easy', medium: 'diff-medium', hard: 'diff-hard', insane: 'diff-insane' };
       const diffLabels = { easy: 'Easy', medium: 'Medium', hard: 'Hard', insane: 'Insane' };
-      
+
       try {
         const res = await fetch(`${API_BASE}/writeups`);
         const json = await res.json();
         if (!json.success || !json.data.length) return;
         grid.innerHTML = '';
-        
+
         json.data.forEach(w => {
-          // Top tags (from w.tags)
           const topTags = (w.tags || []).map((t, idx) => {
             const colors = ['tag-blue', 'tag-purple', 'tag-green', 'tag-yellow'];
-            const colorClass = colors[idx % colors.length];
-            return `<span class="tag ${colorClass}" style="font-size:.65rem;padding:.15rem .5rem">${t}</span>`;
+            return `<span class="tag ${colors[idx % colors.length]}" style="font-size:.65rem;padding:.15rem .5rem">${t}</span>`;
           }).join('');
-          
-          // Steps list
-          const stepsList = (w.steps || []).map(step => `<li>${step}</li>`).join('');
-          
-          // Bottom tags (Platform + Tools Used)
-          const capitalizedPlatform = w.platform === 'tryhackme' ? 'TryHackMe' : 
-                                      w.platform === 'hackthebox' ? 'HackTheBox' : 
-                                      w.platform === 'ctf' ? 'CTF' :
-                                      w.platform === 'vapt' ? 'VAPT' :
-                                      w.platform.charAt(0).toUpperCase() + w.platform.slice(1);
+
+          const steps = w.steps || [];
+          const stepsList = steps.length
+            ? steps.map(step => `<li>${step}</li>`).join('')
+            : '<li>Expand for full technical details in the writeup.</li>';
+
+          const capitalizedPlatform = formatPlatform(w.platform);
           const bottomTags = [`<span class="tag tag-blue">${capitalizedPlatform}</span>`]
             .concat((w.tools_used || []).map((tool, idx) => {
               const colors = ['tag-purple', 'tag-green', 'tag-blue', 'tag-yellow'];
-              const colorClass = colors[idx % colors.length];
-              return `<span class="tag ${colorClass}">${tool}</span>`;
+              return `<span class="tag ${colors[idx % colors.length]}">${tool}</span>`;
             })).join('');
-            
-          const card = document.createElement('div');
+
+          const card = document.createElement('article');
           card.className = 'writeup-card reveal';
-          card.onclick = () => toggleWriteup(card);
-          
+          card.onclick = (e) => {
+            if (e.target.closest('.writeup-btn')) return;
+            toggleWriteup(card);
+          };
+
           card.innerHTML = `
             <div class="writeup-header">
               <div>
@@ -2930,26 +3036,25 @@ app.use(cors({
                   <span class="diff-badge ${diffClasses[w.difficulty] || 'diff-medium'}">${diffLabels[w.difficulty] || 'Medium'}</span>
                   <div class="about-tags" style="margin:0">${topTags}</div>
                 </div>
-                <div class="writeup-title">${w.title}</div>
-                <div class="writeup-summary">${w.summary}</div>
+                <h3 class="writeup-title">${w.title || 'Untitled Writeup'}</h3>
+                <p class="writeup-summary">${w.summary || 'Security research writeup — open for the full technical breakdown.'}</p>
               </div>
-              <span class="writeup-expand">▼</span>
+              <span class="writeup-expand" aria-hidden="true">▼</span>
             </div>
             <div class="writeup-body">
-              <div class="writeup-content" onclick="event.stopPropagation()">
-                <ul class="writeup-steps">
-                  ${stepsList}
-                </ul>
-                <div class="writeup-tags">
-                  ${bottomTags}
+              <div class="writeup-body-inner">
+                <div class="writeup-content" onclick="event.stopPropagation()">
+                  <ul class="writeup-steps">${stepsList}</ul>
+                  <div class="writeup-tags">${bottomTags}</div>
                 </div>
-                <button class="writeup-btn" onclick="openWriteup('${w.id}')" style="cursor:pointer;">Read Full Writeup →</button>
               </div>
+            </div>
+            <div class="writeup-footer">
+              ${buildWriteupAction(w)}
             </div>`;
           grid.appendChild(card);
         });
-        
-        // Re-observe newly created cards for scroll animation
+
         grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       } catch (err) {
         console.warn('Writeups API unavailable — using static content:', err.message);
@@ -2957,6 +3062,10 @@ app.use(cors({
     }
 
     async function openWriteup(id) {
+      if (id == null || id === '') {
+        window.location.hash = 'seclab';
+        return;
+      }
       document.getElementById('blogModal').classList.add('open');
       document.body.style.overflow = 'hidden';
       document.getElementById('blogModalContent').innerHTML = `
@@ -2967,14 +3076,9 @@ app.use(cors({
         if (!json.success) throw new Error(json.message);
         const w = json.data;
         const date = new Date(w.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        const cleanHTML = marked.parse(w.content);
-        
-        const capitalizedPlatform = w.platform === 'tryhackme' ? 'TryHackMe' : 
-                                    w.platform === 'hackthebox' ? 'HackTheBox' : 
-                                    w.platform === 'ctf' ? 'CTF' :
-                                    w.platform === 'vapt' ? 'VAPT' :
-                                    w.platform.charAt(0).toUpperCase() + w.platform.slice(1);
-        
+        const cleanHTML = marked.parse(w.content || '_No content available yet._');
+        const capitalizedPlatform = formatPlatform(w.platform);
+
         document.getElementById('blogModalContent').innerHTML = `
           <div class="blog-modal-meta">
             <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${capitalizedPlatform}</span>
