@@ -1,10 +1,19 @@
 const express   = require('express');
 const router    = express.Router();
 const nodemailer = require('nodemailer');
+const rateLimit = require('express-rate-limit');
 const { body }  = require('express-validator');
 const { query }    = require('../db/connection');
 const { protect }  = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
+
+const contactSubmitLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Message limit reached. Try again in an hour.' },
+});
 
 // Create reusable transporter
 const transporter = nodemailer.createTransport({
@@ -19,6 +28,7 @@ const transporter = nodemailer.createTransport({
 
 // ─── POST /api/contact ───────────────────────────────────────
 router.post('/',
+  contactSubmitLimiter,
   [
     body('name').notEmpty().trim().isLength({ max: 100 }).withMessage('Name required (max 100 chars)'),
     body('email').isEmail().normalizeEmail().withMessage('Valid email required'),

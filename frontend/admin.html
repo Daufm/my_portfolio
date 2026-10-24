@@ -1390,7 +1390,12 @@
         clearToken();
         doLogout();
       }
-      if (!res.ok) throw new Error(json.message || 'Request failed');
+      if (!res.ok) {
+        const error = new Error(json.message || `Request failed (${res.status})`);
+        error.status = res.status;
+        error.retryAfter = res.headers.get('Retry-After');
+        throw error;
+      }
       return json;
     }
 
@@ -1411,21 +1416,26 @@
     }
 
     async function loadDashboard() {
-      try {
-        const [projects, blogs, writeups, messages] = await Promise.all([
-          apiFetch('/projects'),
-          apiFetch('/blogs/admin/all'),
-          apiFetch('/writeups/admin/all'),
-          apiFetch('/contact?status=unread&limit=1'),
-        ]);
-        document.getElementById('statProjects').textContent = (projects.data || []).length;
-        document.getElementById('statBlogs').textContent = (blogs.data || []).filter(item => item.published).length;
-        document.getElementById('statWriteups').textContent = (writeups.data || []).filter(item => item.published).length;
-        document.getElementById('statMessages').textContent = messages.pagination?.total ?? (messages.data || []).length;
-        document.querySelectorAll('.summary-value').forEach(el => el.classList.remove('loading'));
-      } catch (err) {
-        showToast(`Dashboard: ${err.message}`, 'error');
-      }
+      const loadCard = async (endpoint, id, getValue) => {
+        try {
+          const json = await apiFetch(endpoint);
+          const card = document.getElementById(id);
+          card.textContent = getValue(json);
+          card.classList.remove('loading');
+        } catch (err) {
+          const card = document.getElementById(id);
+          card.textContent = '—';
+          card.classList.remove('loading');
+          const retry = err.retryAfter ? ` Try again in ${err.retryAfter} seconds.` : '';
+          showToast(`${endpoint}: ${err.message}.${retry}`, 'error');
+        }
+      };
+      await Promise.all([
+        loadCard('/projects', 'statProjects', json => (json.data || []).length),
+        loadCard('/blogs/admin/all', 'statBlogs', json => (json.data || []).filter(item => item.published).length),
+        loadCard('/writeups/admin/all', 'statWriteups', json => (json.data || []).filter(item => item.published).length),
+        loadCard('/contact?status=unread&limit=1', 'statMessages', json => json.pagination?.total ?? (json.data || []).length),
+      ]);
     }
 
     /* auto-login if token exists */
@@ -1696,12 +1706,17 @@
       try {
         const tok = getToken();
         const headers = { Authorization: `Bearer ${tok}` };
-        const [bRes, wRes] = await Promise.all([
-          fetch(`${API}/blogs/admin/all`, { headers }),
-          fetch(`${API}/writeups/admin/all`, { headers }),
+        const results = await Promise.allSettled([
+          apiFetch('/blogs/admin/all'),
+          apiFetch('/writeups/admin/all'),
         ]);
-        const bJson = await bRes.json();
-        const wJson = await wRes.json();
+        const bJson = results[0].status === 'fulfilled' ? results[0].value : { data: [] };
+        const wJson = results[1].status === 'fulfilled' ? results[1].value : { data: [] };
+        const failed = results.find(result => result.status === 'rejected');
+        if (failed) {
+          const retry = failed.reason.retryAfter ? ` Try again in ${failed.reason.retryAfter} seconds.` : '';
+          showToast(`Some recent posts could not load: ${failed.reason.message}.${retry}`, 'error');
+        }
 
         const blogs = (bJson.data || []).map(p => ({ ...p, _type: 'blog' }));
         const writeups = (wJson.data || []).map(w => ({ ...w, _type: 'writeup' }));
@@ -1731,7 +1746,8 @@
         </tr>`;
         }).join('');
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" class="table-empty" style="color:var(--red)">Failed to load: ${err.message}</td></tr>`;
+        const retry = err.retryAfter ? ` Try again in ${err.retryAfter} seconds.` : '';
+        tbody.innerHTML = `<tr><td colspan="5" class="table-empty" style="color:var(--red)">Failed to load: ${err.message}.${retry}</td></tr>`;
       }
     }
 

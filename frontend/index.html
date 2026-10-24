@@ -1788,6 +1788,14 @@
       font-size: .9rem
     }
 
+    .form-error {
+      color: #ef4444;
+      display: none;
+      font-family: var(--mono);
+      font-size: .75rem;
+      margin-top: .35rem;
+    }
+
     /* FOOTER */
     footer {
       background: var(--bg);
@@ -2531,19 +2539,23 @@
             <div class="form-group">
               <label class="form-label">Your Name</label>
               <input class="form-input" id="cName" type="text" placeholder="John Smith" />
+              <div class="form-error" id="cNameError"></div>
             </div>
             <div class="form-group">
               <label class="form-label">Email Address</label>
               <input class="form-input" id="cEmail" type="email" placeholder="john@company.com" />
+              <div class="form-error" id="cEmailError"></div>
             </div>
             <div class="form-group">
               <label class="form-label">Subject</label>
               <input class="form-input" id="cSubject" type="text" placeholder="Penetration Testing / Project Inquiry" />
+              <div class="form-error" id="cSubjectError"></div>
             </div>
             <div class="form-group">
               <label class="form-label">Message</label>
               <textarea class="form-textarea" id="cMsg"
                 placeholder="Tell me about your project or security needs..."></textarea>
+              <div class="form-error" id="cMsgError"></div>
             </div>
             <button class="form-submit" onclick="submitForm()">Send Message →</button>
             <div class="form-success" id="formSuccess">
@@ -2895,13 +2907,37 @@ app.use(cors({
       const email = document.getElementById('cEmail').value.trim();
       const subject = document.getElementById('cSubject').value.trim();
       const msg = document.getElementById('cMsg').value.trim();
-      if (!name || !email || !msg) {
-        alert('Please fill in Name, Email, and Message.');
-        return;
-      }
-      const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailReg.test(email)) { alert('Please enter a valid email address.'); return; }
       const btn = document.querySelector('.form-submit');
+      const success = document.getElementById('formSuccess');
+      const errors = {
+        name: document.getElementById('cNameError'),
+        email: document.getElementById('cEmailError'),
+        subject: document.getElementById('cSubjectError'),
+        message: document.getElementById('cMsgError'),
+      };
+      Object.values(errors).forEach(error => {
+        error.textContent = '';
+        error.style.display = 'none';
+      });
+      success.style.display = 'none';
+
+      const showError = (field, message) => {
+        if (!errors[field]) return;
+        errors[field].textContent = message;
+        errors[field].style.display = 'block';
+      };
+      const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      let valid = true;
+      if (!name) { showError('name', 'Name is required.'); valid = false; }
+      if (!email) { showError('email', 'Email is required.'); valid = false; }
+      else if (!emailReg.test(email)) { showError('email', 'Please enter a valid email address.'); valid = false; }
+      if (!msg) { showError('message', 'Message is required.'); valid = false; }
+      else if (msg.length < 10 || msg.length > 5000) {
+        showError('message', 'Message must be between 10 and 5000 characters.');
+        valid = false;
+      }
+      if (!valid) return;
+
       btn.textContent = 'Sending...';
       btn.disabled = true;
       try {
@@ -2911,11 +2947,20 @@ app.use(cors({
           body: JSON.stringify({ name, email, subject, message: msg }),
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.message || 'Server error');
-        document.getElementById('formSuccess').style.display = 'block';
-        btn.style.display = 'none';
+        if (!res.ok) {
+          if (Array.isArray(json.errors)) {
+            json.errors.forEach(error => showError(error.field, error.msg));
+          }
+          throw new Error(json.message || 'Server error');
+        }
+        success.textContent = json.message || "Message received! I'll get back to you within 24 hours.";
+        success.style.display = 'block';
+        document.getElementById('contactForm').querySelectorAll('input, textarea').forEach(field => { field.value = ''; });
       } catch (err) {
-        alert(`Failed to send: ${err.message}`);
+        if (!Object.values(errors).some(error => error.style.display === 'block')) {
+          showError('message', `Failed to send: ${err.message}`);
+        }
+      } finally {
         btn.textContent = 'Send Message →';
         btn.disabled = false;
       }

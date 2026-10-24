@@ -56,13 +56,6 @@ const authLimiter = rateLimit({
   message: { success: false, message: 'Too many login attempts. Try again later.' },
 });
 
-// Strict limiter for contact — 5 per hour
-const contactLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  message: { success: false, message: 'Message limit reached. Try again in an hour.' },
-});
-
 // ═══════════════════════════════════════════════
 //  BODY PARSING
 // ═══════════════════════════════════════════════
@@ -95,7 +88,7 @@ app.use('/api/auth',     authLimiter,    authRoutes);
 app.use('/api/blogs',                    blogRoutes);
 app.use('/api/projects',                 projectRoutes);
 app.use('/api/writeups',                 writeupsRoutes);
-app.use('/api/contact',  contactLimiter, contactRoutes);
+app.use('/api/contact',                  contactRoutes);
 
 // ─── API root info ───────────────────────────────────────────
 app.get('/api', (_req, res) => {
