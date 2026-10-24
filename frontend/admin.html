@@ -1090,26 +1090,27 @@
           <div class="type-desc">Write a cybersecurity article, tutorial, or web development post for your blog.</div>
         </div>
 
-        <div class="management-panel" id="projectsPanel">
-          <div class="panel-toolbar">
-            <div class="panel-title">Projects</div>
-            <input class="form-input" id="projectSearch" placeholder="Search projects..." oninput="filterProjects()" />
-            <button class="btn-small" onclick="newProject()">+ New project</button>
-          </div>
-          <div id="projectEditor" style="display:none"></div>
-          <table class="manage-table"><thead><tr><th>Project</th><th>Type</th><th>Featured</th><th>Actions</th></tr></thead><tbody id="projectsBody"><tr><td colspan="4" class="table-empty">Loading...</td></tr></tbody></table>
-        </div>
-
-        <div class="management-panel" id="messagesPanel">
-          <div class="panel-toolbar"><div class="panel-title">Contact messages</div><button class="btn-small" onclick="loadMessages()">Refresh</button></div>
-          <div id="messagesBody"><div class="table-empty">Loading...</div></div>
-        </div>
         <div class="type-card wu-type" id="cardWriteup" onclick="selectType('writeup')">
           <div class="type-check" id="checkWriteup">✓</div>
           <div class="type-icon">🏴</div>
           <div class="type-name">CTF / Writeup</div>
           <div class="type-desc">Document a TryHackMe room, HackTheBox machine, or VAPT engagement writeup.</div>
         </div>
+      </div>
+
+      <div class="management-panel" id="projectsPanel">
+        <div class="panel-toolbar">
+          <div class="panel-title">Projects</div>
+          <input class="form-input" id="projectSearch" placeholder="Search projects..." oninput="filterProjects()" />
+          <button class="btn-small" onclick="newProject()">+ New project</button>
+        </div>
+        <div id="projectEditor" style="display:none"></div>
+        <table class="manage-table"><thead><tr><th>Project</th><th>Type</th><th>Featured</th><th>Actions</th></tr></thead><tbody id="projectsBody"><tr><td colspan="4" class="table-empty">Loading...</td></tr></tbody></table>
+      </div>
+
+      <div class="management-panel" id="messagesPanel">
+        <div class="panel-toolbar"><div class="panel-title">Contact messages</div><button class="btn-small" onclick="loadMessages(true)">Refresh</button></div>
+        <div id="messagesBody"><div class="table-empty">Loading...</div></div>
       </div>
 
       <hr class="divider" id="contentDivider" />
@@ -1962,14 +1963,21 @@
       }
     }
 
-    async function loadMessages() {
+    let messagesLoaded = false;
+    let messagesLoadPromise = null;
+
+    async function loadMessages(force = false) {
+      if (messagesLoaded && !force) return;
+      if (messagesLoadPromise) return messagesLoadPromise;
       const container = document.getElementById('messagesBody');
       container.innerHTML = '<div class="table-empty">Loading...</div>';
-      try {
-        const json = await apiFetch('/contact?limit=50');
+      messagesLoadPromise = (async () => {
+        try {
+          const json = await apiFetch('/contact?limit=50');
         const messages = json.data || [];
         if (!messages.length) {
           container.innerHTML = '<div class="table-empty">No contact messages.</div>';
+          messagesLoaded = true;
           return;
         }
         container.innerHTML = messages.map(message => `<article class="message-card">
@@ -1980,15 +1988,22 @@
             ${['unread','read','replied','archived'].map(status => `<option value="${status}" ${message.status === status ? 'selected' : ''}>${status}</option>`).join('')}
           </select>
         </article>`).join('');
-      } catch (err) {
-        container.innerHTML = `<div class="table-empty" style="color:var(--red)">${escapeHtml(err.message)}</div>`;
-      }
+          messagesLoaded = true;
+        } catch (err) {
+          container.innerHTML = `<div class="table-empty" style="color:var(--red)">${escapeHtml(err.message)}</div>`;
+        } finally {
+          messagesLoadPromise = null;
+        }
+      })();
+      return messagesLoadPromise;
     }
 
     async function updateMessageStatus(id, status) {
       try {
         await apiFetch(`/contact/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
         showToast('Message status updated');
+        messagesLoaded = false;
+        await loadMessages(true);
         loadDashboard();
       } catch (err) {
         showToast(err.message, 'error');
