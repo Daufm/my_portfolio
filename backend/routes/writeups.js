@@ -72,12 +72,26 @@ router.get('/admin/all', protect, async (req, res) => {
   }
 });
 
+// ─── GET /api/writeups/admin/:id ─────────────────────────────
+// Admin only — single writeup including drafts and private flag
+router.get('/admin/:id', protect, async (req, res) => {
+  try {
+    const result = await query('SELECT * FROM writeups WHERE id = $1', [req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ success: false, message: 'Not found' });
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // ─── GET /api/writeups/slug/:slug ───────────────────────────
 // Public — single writeup addressed by its shareable slug.
 router.get('/slug/:slug', async (req, res) => {
   try {
     const result = await query(
-      'SELECT * FROM writeups WHERE slug = $1 AND published = true',
+      `SELECT id, title, slug, platform, difficulty, summary, content, tags,
+              steps, tools_used, published, views, created_at, updated_at
+       FROM writeups WHERE slug = $1 AND published = true`,
       [req.params.slug]
     );
     if (!result.rows.length) return res.status(404).json({ success: false, message: 'Not found' });
@@ -93,7 +107,9 @@ router.get('/slug/:slug', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const result = await query(
-      'SELECT * FROM writeups WHERE id = $1 AND published = true',
+      `SELECT id, title, slug, platform, difficulty, summary, content, tags,
+              steps, tools_used, published, views, created_at, updated_at
+       FROM writeups WHERE id = $1 AND published = true`,
       [req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ success: false, message: 'Not found' });
@@ -145,6 +161,22 @@ router.patch('/:id', protect, async (req, res) => {
   const allowed = ['title','platform','difficulty','summary','content','tags','steps','tools_used','flag','published'];
   const fields  = Object.keys(req.body).filter(k => allowed.includes(k));
   if (!fields.length) return res.status(400).json({ success: false, message: 'Nothing to update' });
+  if (req.body.platform !== undefined && !['tryhackme','hackthebox','ctf','vapt','custom'].includes(req.body.platform)) {
+    return res.status(400).json({ success: false, message: 'Invalid platform' });
+  }
+  if (req.body.difficulty !== undefined && !['easy','medium','hard','insane'].includes(req.body.difficulty)) {
+    return res.status(400).json({ success: false, message: 'Invalid difficulty' });
+  }
+  for (const field of ['tags', 'steps', 'tools_used']) {
+    if (req.body[field] !== undefined && !Array.isArray(req.body[field])) {
+      return res.status(400).json({ success: false, message: `${field} must be an array` });
+    }
+  }
+  for (const field of ['title', 'summary', 'content']) {
+    if (req.body[field] !== undefined && (typeof req.body[field] !== 'string' || !req.body[field].trim())) {
+      return res.status(400).json({ success: false, message: `${field} is required` });
+    }
+  }
 
   const sets   = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
   const values = fields.map(f => req.body[f]);

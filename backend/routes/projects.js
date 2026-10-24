@@ -81,6 +81,24 @@ router.patch('/:id', protect, async (req, res) => {
                    'github_url','demo_url','featured','sort_order'];
   const fields  = Object.keys(req.body).filter(k => allowed.includes(k));
   if (!fields.length) return res.status(400).json({ success: false, message: 'Nothing to update' });
+  if (req.body.type !== undefined && !['dev', 'sec'].includes(req.body.type)) {
+    return res.status(400).json({ success: false, message: 'Invalid project type' });
+  }
+  if (req.body.title !== undefined && (typeof req.body.title !== 'string' || !req.body.title.trim())) {
+    return res.status(400).json({ success: false, message: 'Title is required' });
+  }
+  if (req.body.description !== undefined && (typeof req.body.description !== 'string' || !req.body.description.trim())) {
+    return res.status(400).json({ success: false, message: 'Description is required' });
+  }
+  if (req.body.tech_stack !== undefined && !Array.isArray(req.body.tech_stack)) {
+    return res.status(400).json({ success: false, message: 'Technology stack must be an array' });
+  }
+  if (req.body.featured !== undefined && typeof req.body.featured !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'Featured must be boolean' });
+  }
+  if (req.body.sort_order !== undefined && (!Number.isInteger(req.body.sort_order) || req.body.sort_order < 0)) {
+    return res.status(400).json({ success: false, message: 'Sort order must be a non-negative integer' });
+  }
 
   const sets   = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
   const values = fields.map(f => req.body[f]);

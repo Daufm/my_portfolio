@@ -1,5 +1,6 @@
 const express = require('express');
 const router  = express.Router();
+const { randomUUID } = require('crypto');
 const { body, query: qParam } = require('express-validator');
 const { query }    = require('../db/connection');
 const { protect }  = require('../middleware/auth');
@@ -11,7 +12,20 @@ const slugify = (str) =>
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
-    .slice(0, 100);
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100)
+    .replace(/-+$/, '') || 'article';
+
+async function createUniqueSlug(title) {
+  const base = slugify(title);
+  let candidate = base;
+  while (true) {
+    const existing = await query('SELECT id FROM blog_posts WHERE slug = $1', [candidate]);
+    if (!existing.rows.length) return candidate;
+    candidate = `${base.slice(0, 100 - 13)}-${randomUUID().replace(/-/g, '').slice(0, 12)}`;
+  }
+}
 
 // ─── GET /api/blogs ─────────────────────────────────────────
 // Public — list published posts with optional filters
@@ -68,6 +82,38 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /api/blogs/admin/all ────────────────────────────────
+// Admin only — includes drafts
+router.get('/admin/all', protect, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id, title, slug, excerpt, category, tags, read_time_min,
+              published, views, published_at, created_at
+       FROM blog_posts ORDER BY created_at DESC`
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ─── GET /api/blogs/admin/:id ────────────────────────────────
+// Admin only — single post including drafts for editing
+router.get('/admin/:id', protect, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id, title, slug, excerpt, content, cover_emoji, category, tags,
+              read_time_min, published, published_at, created_at, updated_at
+       FROM blog_posts WHERE id = $1`,
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ success: false, message: 'Post not found' });
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // ─── GET /api/blogs/:slug ────────────────────────────────────
 // Public — single post (increments view counter)
 router.get('/:slug', async (req, res) => {
@@ -114,14 +160,8 @@ router.post('/',
       read_time_min = 5, published = false, cover_emoji = '📝',
     } = req.body;
 
-    const baseSlug = slugify(title);
-    // Ensure slug uniqueness
-    const existing = await query(
-      `SELECT id FROM blog_posts WHERE slug LIKE $1 || '%'`, [baseSlug]
-    );
-    const slug = existing.rows.length ? `${baseSlug}-${Date.now()}` : baseSlug;
-
     try {
+      const slug = await createUniqueSlug(title);
       const result = await query(
         `INSERT INTO blog_posts
            (title, slug, excerpt, content, cover_emoji, category, tags,
@@ -149,6 +189,21 @@ router.patch('/:id', protect, async (req, res) => {
   const allowed = ['title','content','excerpt','category','tags','read_time_min','published','cover_emoji'];
   const fields  = Object.keys(req.body).filter(k => allowed.includes(k));
   if (!fields.length) return res.status(400).json({ success: false, message: 'No valid fields to update' });
+  if (req.body.category !== undefined && !['cybersecurity','webdev','ctf','tutorial'].includes(req.body.category)) {
+    return res.status(400).json({ success: false, message: 'Invalid category' });
+  }
+  if (req.body.title !== undefined && (typeof req.body.title !== 'string' || !req.body.title.trim())) {
+    return res.status(400).json({ success: false, message: 'Title is required' });
+  }
+  if (req.body.content !== undefined && (typeof req.body.content !== 'string' || !req.body.content.trim())) {
+    return res.status(400).json({ success: false, message: 'Content is required' });
+  }
+  if (req.body.tags !== undefined && !Array.isArray(req.body.tags)) {
+    return res.status(400).json({ success: false, message: 'Tags must be an array' });
+  }
+  if (req.body.read_time_min !== undefined && (!Number.isInteger(req.body.read_time_min) || req.body.read_time_min < 1 || req.body.read_time_min > 120)) {
+    return res.status(400).json({ success: false, message: 'Read time must be between 1 and 120 minutes' });
+  }
 
   const sets   = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
   const values = fields.map(f => req.body[f]);
@@ -186,20 +241,6 @@ router.delete('/:id', protect, async (req, res) => {
     );
     if (!result.rows.length) return res.status(404).json({ success: false, message: 'Post not found' });
     res.json({ success: true, message: `Deleted: "${result.rows[0].title}"` });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// ─── GET /api/blogs/admin/all ────────────────────────────────
-// Admin only — includes drafts
-router.get('/admin/all', protect, async (req, res) => {
-  try {
-    const result = await query(
-      `SELECT id, title, slug, category, tags, published, views, published_at, created_at
-       FROM blog_posts ORDER BY created_at DESC`
-    );
-    res.json({ success: true, data: result.rows });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });
   }

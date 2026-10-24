@@ -7,6 +7,7 @@
   <meta name="description" content="Security article by Fuad Mohammed Umer" />
   <title>Security Article | FMU.sec</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -247,7 +248,7 @@
         ? new Date(publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
         : 'Published article';
       const tags = (post.tags || []).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join('');
-      const content = marked.parse(post.content || '_No content available yet._');
+      const content = DOMPurify.sanitize(marked.parse(post.content || '_No content available yet._'));
       const category = articleType === 'blog'
         ? ({ cybersecurity: 'Cybersecurity', webdev: 'Web Dev', ctf: 'CTF Writeup', tutorial: 'Tutorial' }[post.category] || post.category)
         : formatPlatform(post.platform);
