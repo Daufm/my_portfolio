@@ -1215,6 +1215,33 @@
       flex-wrap: wrap
     }
 
+    .blog-tag-filters {
+      display: flex;
+      gap: .6rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: -1.5rem 0 2rem
+    }
+
+    .blog-tag-filter {
+      padding: .4rem .85rem;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: .72rem;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .1);
+      color: var(--muted);
+      background: transparent;
+      transition: .3s
+    }
+
+    .blog-tag-filter.active,
+    .blog-tag-filter:hover {
+      background: rgba(0, 191, 255, .1);
+      border-color: var(--blue);
+      color: var(--blue)
+    }
+
     .blog-cat {
       padding: .4rem 1.2rem;
       border-radius: 20px;
@@ -1351,6 +1378,22 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       flex: 1
+    }
+
+    .blog-card-tags {
+      display: flex;
+      gap: .4rem;
+      flex-wrap: wrap;
+      margin-top: .1rem
+    }
+
+    .blog-card-tag {
+      padding: .15rem .5rem;
+      border: 1px solid rgba(0, 191, 255, .2);
+      border-radius: 999px;
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: .65rem
     }
 
     .blog-read {
@@ -2295,9 +2338,16 @@
         <button class="blog-cat" onclick="filterBlog('ctf',this)">CTF Writeups</button>
         <button class="blog-cat" onclick="filterBlog('tutorial',this)">Tutorials</button>
       </div>
+      <div class="blog-tag-filters" id="blogTagFilters" aria-label="Filter writings by tag">
+        <button class="blog-tag-filter active" type="button" onclick="filterBlogTag('all',this)">All Tags</button>
+        <button class="blog-tag-filter" type="button" data-tag="sqli" onclick="filterBlogTag('sqli',this)">SQLi</button>
+        <button class="blog-tag-filter" type="button" data-tag="owasp" onclick="filterBlogTag('owasp',this)">OWASP</button>
+        <button class="blog-tag-filter" type="button" data-tag="security" onclick="filterBlogTag('security',this)">Security</button>
+        <button class="blog-tag-filter" type="button" data-tag="python" onclick="filterBlogTag('python',this)">Python</button>
+      </div>
       <div class="blog-grid" id="blogGrid">
 
-        <article class="blog-card reveal" data-cat="cybersecurity" tabindex="0" role="link" onclick="openBlog('sql')" onkeydown="if(event.key==='Enter')openBlog('sql')">
+        <article class="blog-card reveal" data-cat="cybersecurity" data-tags="sqli|owasp|banking" tabindex="0" role="link" onclick="openBlogArticle('sql-injection-real-systems')" onkeydown="if(event.key==='Enter'||event.key===' ')openBlogArticle('sql-injection-real-systems')">
           <div class="blog-card-img blog-img-sql" aria-hidden="true">💉</div>
           <div class="blog-card-body">
             <div class="blog-meta">
@@ -2307,11 +2357,12 @@
             <h3 class="blog-title">SQL Injection Explained in Real Systems</h3>
             <p class="blog-excerpt">How attackers exploit SQL injection vulnerabilities in production banking systems,
               with real-world payloads and defense strategies.</p>
+            <div class="blog-card-tags"><span class="blog-card-tag">SQLi</span><span class="blog-card-tag">OWASP</span><span class="blog-card-tag">Banking</span></div>
             <span class="blog-read">Read Article</span>
           </div>
         </article>
 
-        <article class="blog-card reveal" data-cat="ctf" tabindex="0" role="link" onclick="openBlog('thm')" onkeydown="if(event.key==='Enter')openBlog('thm')">
+        <article class="blog-card reveal" data-cat="ctf" data-tags="privesc|linux|tryhackme" tabindex="0" role="link" onclick="openBlogArticle('thm-privesc-walkthrough')" onkeydown="if(event.key==='Enter'||event.key===' ')openBlogArticle('thm-privesc-walkthrough')">
           <div class="blog-card-img blog-img-thm" aria-hidden="true">🏆</div>
           <div class="blog-card-body">
             <div class="blog-meta">
@@ -2321,11 +2372,12 @@
             <h3 class="blog-title">TryHackMe Privilege Escalation Walkthrough</h3>
             <p class="blog-excerpt">Step-by-step guide through a challenging Linux privilege escalation room, from
               initial foothold to root using SUID exploitation.</p>
+            <div class="blog-card-tags"><span class="blog-card-tag">PrivEsc</span><span class="blog-card-tag">Linux</span><span class="blog-card-tag">TryHackMe</span></div>
             <span class="blog-read">Read Article</span>
           </div>
         </article>
 
-        <article class="blog-card reveal" data-cat="webdev" tabindex="0" role="link" onclick="openBlog('api')" onkeydown="if(event.key==='Enter')openBlog('api')">
+        <article class="blog-card reveal" data-cat="webdev" data-tags="fastapi|python|security|api" tabindex="0" role="link" onclick="openBlogArticle('secure-apis-fastapi')" onkeydown="if(event.key==='Enter'||event.key===' ')openBlogArticle('secure-apis-fastapi')">
           <div class="blog-card-img blog-img-api" aria-hidden="true">⚡</div>
           <div class="blog-card-body">
             <div class="blog-meta">
@@ -2335,11 +2387,12 @@
             <h3 class="blog-title">Building Secure APIs with FastAPI</h3>
             <p class="blog-excerpt">Production patterns for securing FastAPI backends — OAuth2, JWT, SQL injection
               prevention, and comprehensive input validation.</p>
+            <div class="blog-card-tags"><span class="blog-card-tag">FastAPI</span><span class="blog-card-tag">Python</span><span class="blog-card-tag">Security</span><span class="blog-card-tag">API</span></div>
             <span class="blog-read">Read Article</span>
           </div>
         </article>
 
-        <article class="blog-card reveal" data-cat="tutorial" tabindex="0" role="link" onclick="openBlog('vuln')" onkeydown="if(event.key==='Enter')openBlog('vuln')">
+        <article class="blog-card reveal" data-cat="tutorial" data-tags="owasp|xss|csrf|security" tabindex="0" role="link" onclick="openBlogArticle('common-web-vulnerabilities')" onkeydown="if(event.key==='Enter'||event.key===' ')openBlogArticle('common-web-vulnerabilities')">
           <div class="blog-card-img blog-img-vuln" aria-hidden="true">🕷️</div>
           <div class="blog-card-body">
             <div class="blog-meta">
@@ -2349,6 +2402,7 @@
             <h3 class="blog-title">Common Web Vulnerabilities and Fixes</h3>
             <p class="blog-excerpt">OWASP Top 10 practical breakdown — real examples of XSS, CSRF, IDOR, and broken
               authentication with hands-on remediation code.</p>
+            <div class="blog-card-tags"><span class="blog-card-tag">OWASP</span><span class="blog-card-tag">XSS</span><span class="blog-card-tag">CSRF</span><span class="blog-card-tag">Security</span></div>
             <span class="blog-read">Read Article</span>
           </div>
         </article>
@@ -2356,14 +2410,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Blog Modal -->
-  <div class="blog-modal-overlay" id="blogModal" onclick="if(event.target===this)closeBlog()">
-    <div class="blog-modal">
-      <button class="blog-modal-close" onclick="closeBlog()">✕ Close</button>
-      <div id="blogModalContent"></div>
-    </div>
-  </div>
 
   <!-- EXPERIENCE -->
   <section id="experience">
@@ -2598,9 +2644,28 @@
       document.querySelectorAll('.blog-cat').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.blog-card').forEach(card => {
-        if (cat === 'all' || card.dataset.cat === cat) { card.style.display = '' }
-        else { card.style.display = 'none' }
+        const tag = document.querySelector('.blog-tag-filter.active')?.dataset.tag || 'all';
+        const categoryMatches = cat === 'all' || card.dataset.cat === cat;
+        const tagMatches = tag === 'all' || card.dataset.tags.split('|').includes(tag);
+        card.style.display = categoryMatches && tagMatches ? '' : 'none';
       });
+    }
+
+    function filterBlogTag(tag, btn) {
+      document.querySelectorAll('.blog-tag-filter').forEach(filter => filter.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.blog-card').forEach(card => {
+        const category = document.querySelector('.blog-cat.active')?.textContent;
+        const categoryKey = { 'All': 'all', 'Cybersecurity': 'cybersecurity', 'Web Dev': 'webdev', 'CTF Writeups': 'ctf', 'Tutorials': 'tutorial' }[category] || 'all';
+        const categoryMatches = categoryKey === 'all' || card.dataset.cat === categoryKey;
+        const tagMatches = tag === 'all' || card.dataset.tags.split('|').includes(tag.toLowerCase());
+        card.style.display = categoryMatches && tagMatches ? '' : 'none';
+      });
+    }
+
+    function openBlogArticle(slug) {
+      if (!slug) return;
+      window.open(`article.html?type=blog&slug=${encodeURIComponent(slug)}`, '_blank', 'noopener,noreferrer');
     }
 
     /* ===== LOAD PROJECTS FROM API ===== */
@@ -2657,7 +2722,9 @@
         const json = await res.json();
         if (!json.success || !json.data.length) return;
         grid.innerHTML = '';
+        const allTags = new Set();
         json.data.forEach(post => {
+          (post.tags || []).forEach(tag => allTags.add(tag));
           const dateObj = post.published_at ? new Date(post.published_at) : null;
           const date = dateObj
             ? dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -2670,7 +2737,8 @@
           card.dataset.cat = post.category;
           card.tabIndex = 0;
           card.setAttribute('role', 'link');
-          const open = () => openBlogBySlug(post.slug);
+          card.dataset.tags = (post.tags || []).map(tag => tag.toLowerCase()).join('|');
+          const open = () => openBlogArticle(post.slug);
           card.onclick = open;
           card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
           card.innerHTML = `
@@ -2682,47 +2750,27 @@
               </div>
               <h3 class="blog-title">${post.title}</h3>
               <p class="blog-excerpt">${post.excerpt || ''}</p>
+              <div class="blog-card-tags">${(post.tags || []).map(tag => `<span class="blog-card-tag">${tag}</span>`).join('')}</div>
               <span class="blog-read">Read Article</span>
             </div>`;
           grid.appendChild(card);
         });
         grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        const filters = document.getElementById('blogTagFilters');
+        [...allTags].sort((a, b) => a.localeCompare(b)).forEach(tag => {
+          if (filters.querySelector(`[data-tag="${CSS.escape(tag.toLowerCase())}"]`)) return;
+          const button = document.createElement('button');
+          button.className = 'blog-tag-filter';
+          button.type = 'button';
+          button.dataset.tag = tag.toLowerCase();
+          button.textContent = tag;
+          button.onclick = () => filterBlogTag(tag.toLowerCase(), button);
+          filters.appendChild(button);
+        });
       } catch (err) {
         console.warn('Blogs API unavailable — using static content:', err.message);
       }
     }
-
- 
-   /* ===== OPEN BLOG BY SLUG (from API) ===== */
-async function openBlogBySlug(slug) {
-  document.getElementById('blogModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  document.getElementById('blogModalContent').innerHTML = `
-    <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono)">Loading...</div>`;
-  try {
-    const res = await fetch(`${API_BASE}/blogs/${slug}`);
-    const json = await res.json();
-    if (!json.success) throw new Error(json.message);
-    const post = json.data;
-    const date = post.published_at
-      ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-      : '';
-
-    // 👇 1. Parse your markdown string into clean HTML tags before rendering
-    const cleanHTML = marked.parse(post.content);
-
-    document.getElementById('blogModalContent').innerHTML = `
-      <div class="blog-modal-meta">
-        <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${post.category}</span>
-        <span style="font-size:.8rem;color:var(--muted);font-family:var(--mono)">${date}</span>
-      </div>
-      <h2 class="blog-modal-title">${post.title}</h2>
-      <div class="blog-modal-content">${cleanHTML}</div>`; // 👈 2. Injected parsed HTML instead of post.content
-  } catch (err) {
-    document.getElementById('blogModalContent').innerHTML =
-      `<p style="color:var(--muted);font-family:var(--mono)">⚠️ Failed to load post: ${err.message}</p>`;
-  }
-}
 
     /* ===== LEGACY openBlog (static fallback keys) ===== */
     const blogPosts = {
@@ -2836,25 +2884,6 @@ app.use(cors({
 }));</code></pre>`
       }
     };
-    function openBlog(key) {
-      const post = blogPosts[key];
-      if (!post) return;
-      document.getElementById('blogModalContent').innerHTML = `
-    <div class="blog-modal-meta">
-      <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${post.cat}</span>
-      <span style="font-size:.8rem;color:var(--muted);font-family:var(--mono)">${post.date}</span>
-    </div>
-    <h2 class="blog-modal-title">${post.title}</h2>
-    <div class="blog-modal-content">${post.content}</div>
-  `;
-      document.getElementById('blogModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeBlog() {
-      document.getElementById('blogModal').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
     /* ===== WRITEUP EXPAND ===== */
     function toggleWriteup(card) {
       card.classList.toggle('expanded');

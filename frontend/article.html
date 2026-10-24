@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Security research and CTF writeup by Fuad Mohammed Umer" />
+  <meta name="description" content="Security article by Fuad Mohammed Umer" />
   <title>Security Article | FMU.sec</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -224,6 +224,8 @@
       }[char]));
     }
 
+    const articleType = params.get('type') === 'blog' ? 'blog' : 'writeup';
+
     function formatPlatform(platform) {
       const labels = { tryhackme: 'TryHackMe', hackthebox: 'HackTheBox', ctf: 'CTF', vapt: 'VAPT' };
       return labels[platform] || (platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : 'Security Article');
@@ -231,28 +233,44 @@
 
     async function loadArticle() {
       if (!slug) throw new Error('This article URL is missing its slug.');
-      const response = await fetch(`${API_BASE}/writeups/slug/${encodeURIComponent(slug)}`);
+      const response = await fetch(
+        articleType === 'blog'
+          ? `${API_BASE}/blogs/${encodeURIComponent(slug)}`
+          : `${API_BASE}/writeups/slug/${encodeURIComponent(slug)}`
+      );
       const result = await response.json();
       if (!response.ok || !result.success) throw new Error(result.message || 'Article not found.');
 
-      const writeup = result.data;
-      const date = writeup.created_at
-        ? new Date(writeup.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      const post = result.data;
+      const publishedDate = articleType === 'blog' ? post.published_at : post.created_at;
+      const date = publishedDate
+        ? new Date(publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
         : 'Published article';
-      const tags = (writeup.tags || []).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join('');
-      const content = marked.parse(writeup.content || '_No content available yet._');
+      const tags = (post.tags || []).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join('');
+      const content = marked.parse(post.content || '_No content available yet._');
+      const category = articleType === 'blog'
+        ? ({ cybersecurity: 'Cybersecurity', webdev: 'Web Dev', ctf: 'CTF Writeup', tutorial: 'Tutorial' }[post.category] || post.category)
+        : formatPlatform(post.platform);
 
-      document.title = `${writeup.title} | FMU.sec`;
+      document.title = `${post.title} | FMU.sec`;
+      document.querySelector('meta[name="description"]').setAttribute(
+        'content',
+        `${post.title} — ${post.excerpt || 'Security article by Fuad Mohammed Umer'}`
+      );
+      document.querySelector('.back-link').href = articleType === 'blog' ? 'index.html#blog' : 'index.html#seclab';
+      document.querySelector('.back-link').textContent = articleType === 'blog'
+        ? '← Back to Security Writings'
+        : '← Back to articles';
       article.innerHTML = `
-        <div class="article-kicker">// ${escapeHTML(formatPlatform(writeup.platform))}</div>
-        <h1>${escapeHTML(writeup.title)}</h1>
-        <p class="article-summary">${escapeHTML(writeup.summary || '')}</p>
+        <div class="article-kicker">// ${escapeHTML(category)}</div>
+        <h1>${escapeHTML(post.title)}</h1>
+        <p class="article-summary">${escapeHTML(articleType === 'blog' ? (post.excerpt || '') : (post.summary || ''))}</p>
         <div class="article-meta">
-          <span class="category">${escapeHTML(formatPlatform(writeup.platform))}</span>
+          <span class="category">${escapeHTML(category)}</span>
           <span>•</span>
-          <time datetime="${escapeHTML(writeup.created_at || '')}">${escapeHTML(date)}</time>
+          <time datetime="${escapeHTML(publishedDate || '')}">${escapeHTML(date)}</time>
           <span>•</span>
-          <span>${escapeHTML(writeup.difficulty || 'research')}</span>
+          <span>${articleType === 'blog' ? `${escapeHTML(post.read_time_min || 5)} min read` : escapeHTML(post.difficulty || 'research')}</span>
         </div>
         <div class="tag-list" aria-label="Article tags">${tags || '<span class="tag">Research</span>'}</div>
         <article class="article-content">${content}</article>`;
@@ -263,7 +281,7 @@
         <div class="state error">
           <div>
             <p>Unable to load this article.</p>
-            <a class="back-link" href="index.html#seclab">← Return to articles</a>
+            <a class="back-link" href="${articleType === 'blog' ? 'index.html#blog' : 'index.html#seclab'}">← Return to articles</a>
           </div>
         </div>`;
       console.error('Article loading failed:', error);
