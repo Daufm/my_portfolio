@@ -411,12 +411,12 @@
 
     /* SECTION COMMONS */
     section {
-      padding: 6rem 2rem
+      padding: clamp(4.5rem, 8vw, 6rem) 2rem
     }
 
     .section-header {
       text-align: center;
-      margin-bottom: 4rem
+      margin-bottom: clamp(2.5rem, 5vw, 4rem)
     }
 
     .section-tag {
@@ -657,16 +657,16 @@
 
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.25rem
     }
 
     .skill-card {
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 2rem;
-      transition: all .4s;
+      padding: 1.5rem;
+      transition: border-color .35s, transform .35s, box-shadow .35s;
       position: relative;
       overflow: hidden
     }
@@ -686,15 +686,15 @@
 
     .skill-card:hover {
       border-color: rgba(0, 255, 136, .4);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 40px rgba(0, 255, 136, .1)
+      transform: translateY(-6px);
+      box-shadow: 0 12px 36px rgba(0, 255, 136, .1)
     }
 
     .skill-card-header {
       display: flex;
       align-items: center;
       gap: .75rem;
-      margin-bottom: 1.5rem
+      margin-bottom: 1.25rem
     }
 
     .skill-icon {
@@ -729,58 +729,53 @@
       color: var(--text)
     }
 
+    .skill-list {
+      display: flex;
+      flex-direction: column;
+      gap: .65rem
+    }
+
     .skill-item {
-      margin-bottom: 1.2rem
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: .7rem .75rem;
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: .82rem;
+      line-height: 1.35;
+      transition: border-color .25s, background .25s, transform .25s
+    }
+
+    .skill-item:hover {
+      background: rgba(0, 255, 136, .05);
+      border-color: rgba(0, 255, 136, .3);
+      transform: translateX(3px)
+    }
+
+    .skill-item::before {
+      content: ">";
+      color: var(--green);
+      font-family: var(--mono);
+      flex-shrink: 0
     }
 
     .skill-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: .4rem;
-      font-size: .85rem
+      min-width: 0
     }
 
     .skill-name {
       color: var(--text)
     }
 
-    .skill-pct {
-      color: var(--muted);
-      font-family: var(--mono)
-    }
-
-    .skill-bar {
-      background: rgba(255, 255, 255, .07);
-      border-radius: 4px;
-      height: 6px;
-      overflow: hidden
-    }
-
-    .skill-fill {
-      height: 100%;
-      border-radius: 4px;
-      width: 0;
-      transition: width 1.4s cubic-bezier(.25, .46, .45, .94)
-    }
-
-    .fill-green {
-      background: linear-gradient(90deg, var(--green), rgba(0, 255, 136, .4))
-    }
-
-    .fill-blue {
-      background: linear-gradient(90deg, var(--blue), rgba(0, 191, 255, .4))
-    }
-
-    .fill-purple {
-      background: linear-gradient(90deg, var(--purple), rgba(147, 51, 234, .4))
-    }
-
     .tools-grid {
       display: flex;
       flex-wrap: wrap;
       gap: .5rem;
-      margin-top: .5rem
+      margin-top: .25rem
     }
 
     .tool-pill {
@@ -800,6 +795,18 @@
     .tool-pill:hover {
       border-color: var(--green);
       color: var(--green)
+    }
+
+    .skill-card:nth-child(2) .skill-item::before {
+      color: var(--blue)
+    }
+
+    .skill-card:nth-child(3) .skill-item::before {
+      color: var(--purple)
+    }
+
+    .skill-card:nth-child(4) .skill-item::before {
+      color: #fbbf24
     }
 
     /* PROJECTS */
@@ -1863,6 +1870,38 @@
         font-size: 1.4rem
       }
     }
+
+    @media(max-width:1050px) {
+      .skills-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+    }
+
+    @media(max-width:480px) {
+      .skills-grid {
+        grid-template-columns: 1fr
+      }
+
+      .skill-card {
+        padding: 1.25rem
+      }
+
+      .hero-content {
+        padding: 1.5rem 1rem
+      }
+    }
+
+    @media(prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto
+      }
+
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+      }
+    }
   </style>
 </head>
 
@@ -1916,8 +1955,8 @@
           <div class="stat-label">TryHackMe Rank</div>
         </div>
         <div class="stat">
-          <div class="stat-num" id="cnt3">0</div>
-          <div class="stat-label">CVEs Analyzed</div>
+          <div class="stat-num" id="cnt3">—</div>
+          <div class="stat-label">Security Findings</div>
         </div>
         <div class="stat">
           <div class="stat-num" id="cnt4">0+</div>
@@ -2021,103 +2060,53 @@
 
         <div class="skill-card reveal">
           <div class="skill-card-header">
-            <div class="skill-icon skill-icon-blue">⚛️</div>
-            <div class="skill-card-title">Full-Stack Development</div>
+            <div class="skill-icon skill-icon-green">⚔️</div>
+            <div class="skill-card-title">Offensive Security</div>
           </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">React.js</span><span class="skill-pct">92%</span></div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-blue" data-width="92"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">Node.js / Express</span><span
-                class="skill-pct">88%</span></div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-blue" data-width="88"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">MongoDB</span><span class="skill-pct">85%</span></div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-blue" data-width="85"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">FastAPI (Python)</span><span class="skill-pct">90%</span>
-            </div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-blue" data-width="90"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">PostgreSQL / SQL</span><span class="skill-pct">87%</span>
-            </div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-blue" data-width="87"></div>
-            </div>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-name">Penetration Testing</span></div>
+            <div class="skill-item"><span class="skill-name">Web Application Security</span></div>
+            <div class="skill-item"><span class="skill-name">Vulnerability Assessment</span></div>
+            <div class="skill-item"><span class="skill-name">Ethical Hacking</span></div>
           </div>
         </div>
 
         <div class="skill-card reveal">
           <div class="skill-card-header">
             <div class="skill-icon skill-icon-green">🛡️</div>
-            <div class="skill-card-title">Cybersecurity</div>
+            <div class="skill-card-title">Defensive Security</div>
           </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">Penetration Testing</span><span
-                class="skill-pct">90%</span></div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-green" data-width="90"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">VAPT</span><span class="skill-pct">88%</span></div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-green" data-width="88"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">Ethical Hacking</span><span class="skill-pct">85%</span>
-            </div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-green" data-width="85"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">Threat Analysis</span><span class="skill-pct">87%</span>
-            </div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-green" data-width="87"></div>
-            </div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-header"><span class="skill-name">Incident Response</span><span
-                class="skill-pct">82%</span></div>
-            <div class="skill-bar">
-              <div class="skill-fill fill-green" data-width="82"></div>
-            </div>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-name">Threat Monitoring</span></div>
+            <div class="skill-item"><span class="skill-name">Incident Response</span></div>
+            <div class="skill-item"><span class="skill-name">SIEM Analysis</span></div>
+            <div class="skill-item"><span class="skill-name">Security Policy &amp; Hardening</span></div>
           </div>
         </div>
 
         <div class="skill-card reveal">
           <div class="skill-card-header">
             <div class="skill-icon skill-icon-purple">🔧</div>
-            <div class="skill-card-title">Tools & Platforms</div>
+            <div class="skill-card-title">Security Research</div>
           </div>
-          <div class="tools-grid">
-            <div class="tool-pill">🐧 Linux</div>
-            <div class="tool-pill">🐙 Git / GitHub</div>
-            <div class="tool-pill">🕷️ Burp Suite</div>
-            <div class="tool-pill">🔍 Nmap</div>
-            <div class="tool-pill">📡 Wireshark</div>
-            <div class="tool-pill">🐍 Python</div>
-            <div class="tool-pill">🐳 Docker</div>
-            <div class="tool-pill">⚡ Metasploit</div>
-            <div class="tool-pill">🔑 John the Ripper</div>
-            <div class="tool-pill">💀 Gobuster</div>
-            <div class="tool-pill">🌐 OWASP ZAP</div>
-            <div class="tool-pill">📊 SIEM</div>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-name">OWASP Top 10</span></div>
+            <div class="skill-item"><span class="skill-name">Attack Chain Analysis</span></div>
+            <div class="skill-item"><span class="skill-name">Security Reporting</span></div>
+            <div class="skill-item"><span class="skill-name">Proof-of-Concept Development</span></div>
+          </div>
+        </div>
+
+        <div class="skill-card reveal">
+          <div class="skill-card-header">
+            <div class="skill-icon skill-icon-blue">⚛️</div>
+            <div class="skill-card-title">Development</div>
+          </div>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-name">React.js / Node.js</span></div>
+            <div class="skill-item"><span class="skill-name">FastAPI / Python</span></div>
+            <div class="skill-item"><span class="skill-name">PostgreSQL / MongoDB</span></div>
+            <div class="skill-item"><span class="skill-name">Git, Docker &amp; Linux</span></div>
           </div>
         </div>
 
@@ -2213,7 +2202,7 @@
             <div class="proj-type proj-type-sec">// Security Research</div>
             <div class="proj-title">VAPT Report: Web App Security Testing</div>
             <div class="proj-desc">Comprehensive vulnerability assessment and penetration testing report for a financial
-              web application. Identified 12 critical CVEs with PoC and remediation guidance.</div>
+              web application. Documented security findings with PoC and remediation guidance.</div>
           </div>
           <div class="proj-body">
             <div class="proj-tags">
@@ -2222,7 +2211,7 @@
               <span class="proj-tag ptag-green">Nmap</span>
               <span class="proj-tag ptag-purple">Report</span>
             </div>
-            <div class="proj-security">12 CVEs discovered • SQLi, XSS, IDOR, Broken Auth findings with full PoC</div>
+            <div class="proj-security">Security findings • SQLi, XSS, IDOR, and broken authentication with full PoC</div>
             <div class="proj-links">
               <a class="proj-link" href="#seclab">Writeup</a>
               <a class="proj-link" href="https://github.com/Daufm" target="_blank">GitHub</a>
@@ -2586,7 +2575,6 @@
       countersStarted = true;
       animateCounter(document.getElementById('cnt1'), 20);
       animateCounter(document.getElementById('cnt2'), 5, '%');
-      animateCounter(document.getElementById('cnt3'), 47);
       animateCounter(document.getElementById('cnt4'), 50, '+');
     }
     setTimeout(startCounters, 1500);
@@ -2596,10 +2584,6 @@
       entries.forEach(e => {
         if (e.isIntersecting) {
           e.target.classList.add('visible');
-          /* animate skill bars */
-          e.target.querySelectorAll('.skill-fill[data-width]').forEach(bar => {
-            setTimeout(() => { bar.style.width = bar.dataset.width + '%' }, 200);
-          });
         }
       });
     }, { threshold: .1 });
