@@ -107,7 +107,7 @@ app.get('/api', (_req, res) => {
       auth:     ['POST /api/auth/login', 'GET /api/auth/me', 'POST /api/auth/change-password'],
       blogs:    ['GET /api/blogs', 'GET /api/blogs/:slug', 'POST /api/blogs *', 'PATCH /api/blogs/:id *', 'DELETE /api/blogs/:id *'],
       projects: ['GET /api/projects', 'GET /api/projects/:id', 'POST /api/projects *', 'PATCH /api/projects/:id *', 'DELETE /api/projects/:id *'],
-      writeups: ['GET /api/writeups', 'GET /api/writeups/:id', 'POST /api/writeups *', 'PATCH /api/writeups/:id *', 'DELETE /api/writeups/:id *'],
+      writeups: ['GET /api/writeups', 'GET /api/writeups/slug/:slug', 'GET /api/writeups/:id', 'POST /api/writeups *', 'PATCH /api/writeups/:id *', 'DELETE /api/writeups/:id *'],
       contact:  ['POST /api/contact', 'GET /api/contact *', 'PATCH /api/contact/:id *'],
     },
     note: '* = requires Bearer token (admin)',

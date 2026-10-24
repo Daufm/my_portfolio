@@ -1,9 +1,38 @@
 const express = require('express');
 const router  = express.Router();
+const { randomUUID } = require('crypto');
 const { body } = require('express-validator');
 const { query }    = require('../db/connection');
 const { protect }  = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
+
+const slugify = (value) => {
+  const slug = String(value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100)
+    .replace(/-+$/, '');
+  return slug || 'writeup';
+};
+
+async function createUniqueSlug(title) {
+  const base = slugify(title);
+  const suffixLength = 12;
+  let candidate = base;
+  while (true) {
+    const existing = await query('SELECT id FROM writeups WHERE slug = $1', [candidate]);
+    if (!existing.rows.length) return candidate;
+
+    const suffix = randomUUID().replace(/-/g, '').slice(0, suffixLength);
+    candidate = `${base.slice(0, 150 - suffixLength - 1)}-${suffix}`;
+  }
+}
 
 // ─── GET /api/writeups ───────────────────────────────────────
 router.get('/', async (req, res) => {
@@ -19,7 +48,7 @@ router.get('/', async (req, res) => {
   const where = conditions.join(' AND ');
   try {
     const result = await query(
-      `SELECT id, title, platform, difficulty, summary, tags, steps, tools_used, published, views, created_at
+      `SELECT id, title, slug, platform, difficulty, summary, tags, steps, tools_used, published, views, created_at
        FROM writeups WHERE ${where} ORDER BY created_at DESC`,
       params
     );
@@ -34,10 +63,27 @@ router.get('/', async (req, res) => {
 router.get('/admin/all', protect, async (req, res) => {
   try {
     const result = await query(
-      `SELECT id, title, platform, difficulty, summary, tags, steps, tools_used, published, views, created_at
+      `SELECT id, title, slug, platform, difficulty, summary, tags, steps, tools_used, published, views, created_at
        FROM writeups ORDER BY created_at DESC`
     );
     res.json({ success: true, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ─── GET /api/writeups/slug/:slug ───────────────────────────
+// Public — single writeup addressed by its shareable slug.
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const result = await query(
+      'SELECT * FROM writeups WHERE slug = $1 AND published = true',
+      [req.params.slug]
+    );
+    if (!result.rows.length) return res.status(404).json({ success: false, message: 'Not found' });
+
+    query('UPDATE writeups SET views = views + 1 WHERE slug = $1', [req.params.slug]).catch(() => {});
+    res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -80,11 +126,12 @@ router.post('/',
       tags = [], steps = [], tools_used = [], flag, published = false,
     } = req.body;
     try {
+      const slug = await createUniqueSlug(title);
       const result = await query(
         `INSERT INTO writeups
-           (title, platform, difficulty, summary, content, tags, steps, tools_used, flag, published)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-        [title, platform, difficulty, summary, content, tags, steps, tools_used, flag, published]
+           (title, slug, platform, difficulty, summary, content, tags, steps, tools_used, flag, published)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+        [title, slug, platform, difficulty, summary, content, tags, steps, tools_used, flag, published]
       );
       res.status(201).json({ success: true, data: result.rows[0] });
     } catch (err) {

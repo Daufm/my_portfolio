@@ -1034,6 +1034,33 @@
       align-items: stretch
     }
 
+    .writeup-filters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin: -1rem 0 2rem
+    }
+
+    .writeup-filter {
+      padding: .45rem .9rem;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .72rem;
+      cursor: pointer;
+      transition: border-color .25s, color .25s, background .25s
+    }
+
+    .writeup-filter:hover,
+    .writeup-filter.active {
+      color: var(--green);
+      border-color: var(--green);
+      background: rgba(0, 255, 136, .08)
+    }
+
     .writeup-card {
       background: var(--card);
       border: 1px solid rgba(255, 255, 255, .07);
@@ -1042,13 +1069,19 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      transition: border-color .3s, transform .3s, box-shadow .3s
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+      cursor: pointer
     }
 
     .writeup-card:hover {
       border-color: rgba(0, 255, 136, .3);
       transform: translateY(-3px);
       box-shadow: 0 12px 32px rgba(0, 255, 136, .08)
+    }
+
+    .writeup-card:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 3px
     }
 
     .writeup-header {
@@ -1122,63 +1155,16 @@
     }
 
     .writeup-expand {
-      color: var(--muted);
-      font-size: 1.2rem;
-      transition: .3s;
+      color: var(--green);
+      font-size: .9rem;
       flex-shrink: 0
-    }
-
-    .writeup-card.expanded .writeup-expand {
-      transform: rotate(180deg);
-      color: var(--green)
-    }
-
-    .writeup-body {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows .35s ease
-    }
-
-    .writeup-card.expanded .writeup-body {
-      grid-template-rows: 1fr
-    }
-
-    .writeup-body-inner {
-      overflow: hidden;
-      min-height: 0
-    }
-
-    .writeup-content {
-      padding: 0 1.2rem 1rem;
-      border-top: 1px solid rgba(255, 255, 255, .05)
-    }
-
-    .writeup-steps {
-      list-style: none;
-      margin: 1rem 0
-    }
-
-    .writeup-steps li {
-      font-size: .82rem;
-      color: var(--muted);
-      padding: .3rem 0;
-      padding-left: 1.2rem;
-      position: relative;
-      line-height: 1.6
-    }
-
-    .writeup-steps li::before {
-      content: "▸";
-      position: absolute;
-      left: 0;
-      color: var(--green)
     }
 
     .writeup-tags {
       display: flex;
       gap: .4rem;
       flex-wrap: wrap;
-      margin-bottom: .25rem
+      margin-top: .85rem
     }
 
     .writeup-footer {
@@ -1993,7 +1979,7 @@
               <div>&nbsp;</div>
               <div><span class="t-output">{</span></div>
               <div>&nbsp; <span class="t-key">"name"</span><span class="t-output">: </span><span class="t-string">"Fuad
-                  Mohammed Umer"</span><span class="t-output">,</span></div>
+                  Mohammed "</span><span class="t-output">,</span></div>
               <div>&nbsp; <span class="t-key">"role"</span><span class="t-output">: </span><span
                   class="t-string">"InfoSec &amp; Full-Stack Eng."</span><span class="t-output">,</span></div>
               <div>&nbsp; <span class="t-key">"company"</span><span class="t-output">: </span><span
@@ -2002,8 +1988,8 @@
                   class="t-string">"B.Sc. CS, Univ. of Gondar"</span><span class="t-output">,</span></div>
               <div>&nbsp; <span class="t-key">"certified"</span><span class="t-output">: </span><span
                   class="t-bool">true</span><span class="t-output">,</span></div>
-              <div>&nbsp; <span class="t-key">"cert"</span><span class="t-output">: </span><span class="t-string">"ICS2
-                  Cybersecurity Pro"</span><span class="t-output">,</span></div>
+              <div>&nbsp; <span class="t-key">"cert"</span><span class="t-output">: </span><span class="t-string">"ICS2 Certified 
+                  Cybersecurity "</span><span class="t-output">,</span></div>
               <div>&nbsp; <span class="t-key">"thm_rank"</span><span class="t-output">: </span><span
                   class="t-string">"Top 5%"</span><span class="t-output">,</span></div>
               <div>&nbsp; <span class="t-key">"stack"</span><span class="t-output">: [</span><span
@@ -2285,6 +2271,9 @@
           <span class="thm-badge">⚡ Top 5% on TryHackMe</span>
         </div>
       </div>
+      <div class="writeup-filters" id="writeupFilters" aria-label="Filter articles by tag">
+        <button class="writeup-filter active" type="button" onclick="filterWriteups('all', this)">All Articles</button>
+      </div>
       <div class="writeups-grid" id="writeupsGrid">
         <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono);grid-column:1/-1;">Loading writeups...</div>
       </div>
@@ -2522,7 +2511,7 @@
 
   <footer>
     <div class="footer-text">
-      <span>fuad@secdev</span>:~$ echo "Built with 💻 &amp; 🛡️ by Fuad Mohammed Umer" &nbsp;•&nbsp; <span>© 2025 All
+      <span>fuad@secdev</span>:~$ echo "Built with 💻 &amp; 🛡️ by Fuad Mohammed" &nbsp;•&nbsp; <span>© 2025 All
         Rights Reserved</span>
       &nbsp;|&nbsp; <a href="admin.html"
         style="color:var(--muted);text-decoration:none;font-family:var(--mono);font-size:0.8rem;transition:color 0.3s;"
@@ -2946,26 +2935,10 @@ app.use(cors({
       });
     }, { passive: true });
 
-    /** Resolve writeup action URL across inconsistent API field names. */
-    function resolveWriteupHref(w) {
-      const candidates = [w.url, w.writeup_url, w.writeup, w.link, w.external_url, w.content_url];
-      for (const value of candidates) {
-        if (typeof value === 'string' && value.trim()) return value.trim();
-      }
-      if (w.id != null && w.id !== '') return null; // internal modal route
-      return '#seclab'; // safe placeholder when nothing is available
-    }
-
     function buildWriteupAction(w) {
-      const href = resolveWriteupHref(w);
       const label = 'Read Full Writeup →';
-      if (href && href !== '#seclab' && /^https?:\/\//i.test(href)) {
-        return `<a class="writeup-btn" href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${label}</a>`;
-      }
-      if (w.id != null && w.id !== '') {
-        return `<a class="writeup-btn" href="#seclab" role="button" onclick="event.preventDefault();event.stopPropagation();openWriteup('${w.id}')">${label}</a>`;
-      }
-      return `<a class="writeup-btn is-placeholder" href="#seclab" onclick="event.stopPropagation()">${label}</a>`;
+      if (!w.slug) return `<span class="writeup-btn is-placeholder">${label}</span>`;
+      return `<a class="writeup-btn" href="article.html?slug=${encodeURIComponent(w.slug)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${label}</a>`;
     }
 
     function formatPlatform(platform) {
@@ -2987,30 +2960,32 @@ app.use(cors({
         const json = await res.json();
         if (!json.success || !json.data.length) return;
         grid.innerHTML = '';
+        const allTags = new Set();
 
         json.data.forEach(w => {
+          (w.tags || []).forEach(tag => allTags.add(tag));
           const topTags = (w.tags || []).map((t, idx) => {
             const colors = ['tag-blue', 'tag-purple', 'tag-green', 'tag-yellow'];
             return `<span class="tag ${colors[idx % colors.length]}" style="font-size:.65rem;padding:.15rem .5rem">${t}</span>`;
           }).join('');
 
-          const steps = w.steps || [];
-          const stepsList = steps.length
-            ? steps.map(step => `<li>${step}</li>`).join('')
-            : '<li>Expand for full technical details in the writeup.</li>';
-
           const capitalizedPlatform = formatPlatform(w.platform);
-          const bottomTags = [`<span class="tag tag-blue">${capitalizedPlatform}</span>`]
-            .concat((w.tools_used || []).map((tool, idx) => {
-              const colors = ['tag-purple', 'tag-green', 'tag-blue', 'tag-yellow'];
-              return `<span class="tag ${colors[idx % colors.length]}">${tool}</span>`;
-            })).join('');
 
           const card = document.createElement('article');
           card.className = 'writeup-card reveal';
-          card.onclick = (e) => {
-            if (e.target.closest('.writeup-btn')) return;
-            toggleWriteup(card);
+          card.dataset.tags = (w.tags || []).join('|').toLowerCase();
+          card.tabIndex = 0;
+          card.setAttribute('role', 'link');
+          const articleUrl = w.slug ? `article.html?slug=${encodeURIComponent(w.slug)}` : '#seclab';
+          const openArticle = () => {
+            if (w.slug) window.open(articleUrl, '_blank', 'noopener,noreferrer');
+          };
+          card.onclick = (e) => { if (!e.target.closest('.writeup-btn')) openArticle(); };
+          card.onkeydown = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openArticle();
+            }
           };
 
           card.innerHTML = `
@@ -3018,20 +2993,15 @@ app.use(cors({
               <div>
                 <div class="writeup-meta">
                   <span class="diff-badge ${diffClasses[w.difficulty] || 'diff-medium'}">${diffLabels[w.difficulty] || 'Medium'}</span>
-                  <div class="about-tags" style="margin:0">${topTags}</div>
                 </div>
                 <h3 class="writeup-title">${w.title || 'Untitled Writeup'}</h3>
                 <p class="writeup-summary">${w.summary || 'Security research writeup — open for the full technical breakdown.'}</p>
               </div>
-              <span class="writeup-expand" aria-hidden="true">▼</span>
+              <span class="writeup-expand" aria-hidden="true">↗</span>
             </div>
-            <div class="writeup-body">
-              <div class="writeup-body-inner">
-                <div class="writeup-content" onclick="event.stopPropagation()">
-                  <ul class="writeup-steps">${stepsList}</ul>
-                  <div class="writeup-tags">${bottomTags}</div>
-                </div>
-              </div>
+            <div class="writeup-tags">
+              <span class="tag tag-blue">${capitalizedPlatform}</span>
+              ${topTags}
             </div>
             <div class="writeup-footer">
               ${buildWriteupAction(w)}
@@ -3040,40 +3010,29 @@ app.use(cors({
         });
 
         grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        const filters = document.getElementById('writeupFilters');
+        [...allTags].sort((a, b) => a.localeCompare(b)).forEach(tag => {
+          const button = document.createElement('button');
+          button.className = 'writeup-filter';
+          button.type = 'button';
+          button.textContent = tag;
+          button.onclick = () => filterWriteups(tag, button);
+          filters.appendChild(button);
+        });
       } catch (err) {
         console.warn('Writeups API unavailable — using static content:', err.message);
       }
     }
 
-    async function openWriteup(id) {
-      if (id == null || id === '') {
-        window.location.hash = 'seclab';
-        return;
-      }
-      document.getElementById('blogModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-      document.getElementById('blogModalContent').innerHTML = `
-        <div style="text-align:center;padding:3rem;color:var(--muted);font-family:var(--mono)">Loading...</div>`;
-      try {
-        const res = await fetch(`${API_BASE}/writeups/${id}`);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.message);
-        const w = json.data;
-        const date = new Date(w.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        const cleanHTML = marked.parse(w.content || '_No content available yet._');
-        const capitalizedPlatform = formatPlatform(w.platform);
-
-        document.getElementById('blogModalContent').innerHTML = `
-          <div class="blog-modal-meta">
-            <span class="blog-cat-badge tag-blue" style="padding:.3rem .8rem;border-radius:4px;font-family:var(--mono);font-size:.75rem">${capitalizedPlatform}</span>
-            <span style="font-size:.8rem;color:var(--muted);font-family:var(--mono)">${date}</span>
-          </div>
-          <h2 class="blog-modal-title">${w.title}</h2>
-          <div class="blog-modal-content">${cleanHTML}</div>`;
-      } catch (err) {
-        document.getElementById('blogModalContent').innerHTML =
-          `<p style="color:var(--muted);font-family:var(--mono)">⚠️ Failed to load writeup: ${err.message}</p>`;
-      }
+    function filterWriteups(tag, button) {
+      document.querySelectorAll('.writeup-filter').forEach(filter => filter.classList.remove('active'));
+      button.classList.add('active');
+      const normalizedTag = tag.toLowerCase();
+      document.querySelectorAll('.writeup-card').forEach(card => {
+        card.style.display = tag === 'all' || card.dataset.tags.split('|').includes(normalizedTag)
+          ? ''
+          : 'none';
+      });
     }
 
     /* ===== BOOT: load dynamic data ===== */
